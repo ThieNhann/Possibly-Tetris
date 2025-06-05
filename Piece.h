@@ -22,6 +22,7 @@ public:
             std::cout << "\n";
         }
     }
+    void CopyPieceMatrix(Piece);
     virtual ~Piece() {}
 public:
     void SetSquare(int, int, Square);

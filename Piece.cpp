@@ -30,6 +30,33 @@ Vector2 Piece::GetPosition() {
     return position;
 }
 
+
+Piece Piece::GetRandomPiece() {
+    int random = GetRandomValue(0, 6);
+
+    switch (random) {
+        case 0: return CubePiece();
+        case 1: return LPiece();
+        case 2: return LInversaPiece();
+        case 3: return Recta();
+        case 4: return TPiece();
+        case 5: return SPiece();
+        case 6: return SInversaPiece();
+        default: return Piece();
+    }
+}
+
+void Piece::CopyPieceMatrix(Piece other) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            pieceMatrix[i][j] = other.pieceMatrix[i][j];
+        }
+    }
+}
+
+
+/*------------------------Derived Pieces------------------------*/
+
 CubePiece::CubePiece() {
     SetSquare(1, 1, FALLING);
     SetSquare(1, 2, FALLING);
@@ -105,18 +132,4 @@ SInversaPiece::SInversaPiece() {
 
 SInversaPiece::SInversaPiece(Vector2 pos) : SInversaPiece() {
     position = pos;
-}
-
-Piece Piece::GetRandomPiece() {
-    int random = GetRandomValue(0, 6);
-
-    switch (random) {
-        case 0: return CubePiece();
-        case 1: return LPiece();
-        case 2: return LInversaPiece();
-        case 3: return Recta();
-        case 4: return TPiece();
-        case 5: return SPiece();
-        case 6: return SInversaPiece();
-    }
 }

@@ -1,81 +1,122 @@
 #include "Piece.h"
 
-Piece::Piece() {}
+Piece::Piece() {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            pieceMatrix[i][j] = EMPTY;
+        }
+    }
+}
 
-Piece::Piece(Vector2 pos) : position(pos) {}
+Piece::Piece(Vector2 pos) : Piece() {
+    position = pos;
+}
 
 void Piece::SetSquare(int i, int j, Square state) {
-    if (i <= 3 && i >= 0 && j <= 3 &&  j >= 0) {
+    if (i >= 0 && i <= 3 && j >= 0 && j <= 4) {
         pieceMatrix[i][j] = state;
     }
 }
 
-Piece Piece::GetRandomPiece()  {
+Square Piece::GetSquare(int i, int j) {
+    return pieceMatrix[i][j];
+}
 
+void Piece::SetPosition(Vector2 pos) {
+    position = pos;
+}
+
+Vector2 Piece::GetPosition() {
+    return position;
+}
+
+CubePiece::CubePiece() {
+    SetSquare(1, 1, FALLING);
+    SetSquare(1, 2, FALLING);
+    SetSquare(2, 1, FALLING);
+    SetSquare(2, 2, FALLING);
+}
+
+CubePiece::CubePiece(Vector2 pos) : CubePiece() {
+    position = pos;
+}
+
+LPiece::LPiece() {
+    SetSquare(1, 0, FALLING);
+    SetSquare(1, 1, FALLING);
+    SetSquare(1, 2, FALLING);
+    SetSquare(2, 2, FALLING);
+}
+
+LPiece::LPiece(Vector2 pos) : LPiece() {
+    position = pos;
+}
+
+LInversaPiece::LInversaPiece() {
+    SetSquare(2, 0, FALLING);
+    SetSquare(2, 1, FALLING);
+    SetSquare(2, 2, FALLING);
+    SetSquare(1, 2, FALLING);
+}
+
+LInversaPiece::LInversaPiece(Vector2 pos) : LInversaPiece() {
+    position = pos;
+}
+
+Recta::Recta() {
+    SetSquare(0, 1, FALLING);
+    SetSquare(1, 1, FALLING);
+    SetSquare(2, 1, FALLING);
+    SetSquare(3, 1, FALLING);
+}
+
+Recta::Recta(Vector2 pos) : Recta() {
+    position = pos;
+}   
+
+TPiece::TPiece() {
+    SetSquare(1, 0, FALLING);
+    SetSquare(1, 1, FALLING);
+    SetSquare(1, 2, FALLING);
+    SetSquare(2, 1, FALLING);
+}
+
+TPiece::TPiece(Vector2 pos) : TPiece() {
+    position = pos;
+}
+
+SPiece::SPiece() {
+    SetSquare(1, 1, FALLING);
+    SetSquare(2, 1, FALLING);
+    SetSquare(2, 2, FALLING);
+    SetSquare(3, 2, FALLING);
+}
+
+SPiece::SPiece(Vector2 pos) : SPiece() {
+    position = pos;
+}
+
+SInversaPiece::SInversaPiece() {
+    SetSquare(1, 2, FALLING);
+    SetSquare(2, 2, FALLING);
+    SetSquare(2, 1, FALLING);
+    SetSquare(3, 1, FALLING);
+}
+
+SInversaPiece::SInversaPiece(Vector2 pos) : SInversaPiece() {
+    position = pos;
+}
+
+Piece Piece::GetRandomPiece() {
     int random = GetRandomValue(0, 6);
 
-    Piece piece;
-
-    for (int i = 0; i < 4; ++i) {
-
-        for (int j = 0; j < 4; ++j) {
-
-            piece.SetSquare(i, j, EMPTY);
-
-        }
-
-    }
-
     switch (random) {
-
-        case 0: {
-            piece.SetSquare(1, 1, FALLING);
-            piece.SetSquare(1, 2, FALLING);
-            piece.SetSquare(2, 1, FALLING);
-            piece.SetSquare(2, 2, FALLING);
-        } break;
-
-        case 1: {
-            piece.SetSquare(1, 0, FALLING);
-            piece.SetSquare(1, 1, FALLING);
-            piece.SetSquare(2, 1, FALLING);
-            piece.SetSquare(2, 2, FALLING);
-        } break;
-
-        case 2: {
-            piece.SetSquare(2, 0, FALLING);
-            piece.SetSquare(2, 1, FALLING);
-            piece.SetSquare(2, 2, FALLING);
-            piece.SetSquare(1, 2, FALLING);
-        } break;
-
-        case 3: {
-            piece.SetSquare(0, 1, FALLING);
-            piece.SetSquare(1, 1, FALLING);
-            piece.SetSquare(2, 1, FALLING);
-            piece.SetSquare(3, 1, FALLING);
-        } break;
-
-        case 4: {
-            piece.SetSquare(1, 0, FALLING);
-            piece.SetSquare(1, 1, FALLING);
-            piece.SetSquare(1, 2, FALLING);
-            piece.SetSquare(2, 1, FALLING);
-        } break;
-
-        case 5: {
-            piece.SetSquare(1, 1, FALLING);
-            piece.SetSquare(2, 1, FALLING);
-            piece.SetSquare(2, 2, FALLING);
-            piece.SetSquare(3, 2, FALLING);
-        } break;
-
-        case 6: {
-            piece.SetSquare(1, 2, FALLING);
-            piece.SetSquare(2, 2, FALLING);
-            piece.SetSquare(2, 1, FALLING);
-            piece.SetSquare(3, 1, FALLING);
-        } break;
-        
+        case 0: return CubePiece();
+        case 1: return LPiece();
+        case 2: return LInversaPiece();
+        case 3: return Recta();
+        case 4: return TPiece();
+        case 5: return SPiece();
+        case 6: return SInversaPiece();
     }
 }

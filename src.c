@@ -469,6 +469,7 @@ static void GetRandompiece()
         case 5: { incomingPiece[1][1] = MOVING; incomingPiece[2][1] = MOVING; incomingPiece[2][2] = MOVING; incomingPiece[3][2] = MOVING; } break;    //S
         case 6: { incomingPiece[1][2] = MOVING; incomingPiece[2][2] = MOVING; incomingPiece[2][1] = MOVING; incomingPiece[3][1] = MOVING; } break;    //S inversa
     }
+    
 }
 
 static void ResolveFallingMovement(bool *detection, bool *pieceActive)

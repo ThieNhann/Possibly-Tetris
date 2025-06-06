@@ -6,7 +6,7 @@
 #include "Piece.h"
 #include "Sounds.h"
 #include <raylib.h>
-
+#include <fstream>
 
 class Game {
 private:
@@ -29,6 +29,7 @@ public:
     int gravitySpeed;
     int level;
     int score;
+    int highScore;
 public: 
     Game();
     void Reset();
@@ -42,6 +43,8 @@ public:
     void DrawGame();
     void UpdateDrawGame();
     bool UpdateTurningMovement();
+    void LoadHighscore();
+    void SaveHighscore();
 };
 
 

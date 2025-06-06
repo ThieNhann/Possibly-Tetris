@@ -2,7 +2,7 @@
 
 Game::Game() : grid(), incomingPiece() {
 
-    /*Đọc highscore*/
+    LoadHighscore();
     Reset();
 }
 
@@ -43,8 +43,14 @@ void Game::CreatePiece() {
 
     incomingPiece = Piece::GetRandomPiece();
 
-    grid.AssignPiece(pieceSpawnPosition, activePiece);
-    
+    for (int j = 0; j < 4; j++) {
+        for (int i = 0; i < 4; i++) {
+            if (activePiece.GetSquare(i, j) == FALLING) {
+                grid.SetSquare(pieceSpawnPosition.x + i, pieceSpawnPosition.y + j, FALLING);
+            }
+        }
+    }
+
 }
 
 bool Game::CheckCollision() {
@@ -67,7 +73,7 @@ void Game::CheckCompletedLine() {
 
         fullSquareCount = 0;
 
-        for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
+        for (int i = 1; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
 
             if (grid.GetSquare(i, j) == FULL) ++fullSquareCount;
 
@@ -296,7 +302,7 @@ bool Game::UpdateTurningMovement() {
                 {
                     if (activePiece.GetSquare(i - piecePositionX, j - piecePositionY) == FALLING)
                     {
-                        if (i >= 0 && i < HORIZONTAL_GRID_SIZE && j >= 0 && j < VERTICAL_GRID_SIZE) {
+                        if (i >= 0 && i < HORIZONTAL_GRID_SIZE - 1 && j >= 0 && j < VERTICAL_GRID_SIZE - 1) {
                             grid.SetSquare(i, j, FALLING);
                         }
                     }
@@ -343,7 +349,7 @@ void Game::UpdateGame() {
                     }
                     if (IsKeyDown(KEY_DOWN) && (fastFallMovementCounter >= FAST_FALL_AWAIT_COUNTER))
                     {
-                        gravityMovementCounter += gravitySpeed /*Gravity Speed*/;
+                        gravityMovementCounter += gravitySpeed;
                     }
 
                     if (gravityMovementCounter >= gravitySpeed) {
@@ -430,7 +436,12 @@ void Game::UpdateGame() {
     {
         if (IsKeyPressed(KEY_ENTER))
         {
+            if (score > highScore) {
+                highScore = score;
+                SaveHighscore();
+            }
             Reset();
+
         }
     }
 }
@@ -515,15 +526,38 @@ void Game::DrawGame() {
 
             DrawText("INCOMING:", controller, 20, 14, GRAY);
             DrawText(TextFormat("SCORE: %04i", score ), controller, offset.y + 10, 14, GRAY);
+            DrawText(TextFormat("HIGH SCORE: %04i", highScore), controller, offset.y + 30, 14, GRAY);
 
             if (pause) DrawText("GAME PAUSED", screenWidth/2 - MeasureText("GAME PAUSED", 40)/2, screenHeight/2 - 40, 40, GRAY);
         
         }
-        else DrawText("PRESS [ENTER] TO PLAY AGAIN", screenWidth/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, screenHeight/2 - 50, 20, GRAY);
+        else {
+            DrawText(TextFormat("SCORE: %04i", score), screenWidth/2 - MeasureText(TextFormat("HIGH SCORE: %04i", highScore), 20)/2, screenHeight/2 - 80, 20, GRAY);
+            DrawText("PRESS [ENTER] TO PLAY AGAIN", screenWidth/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, screenHeight/2 - 50, 20, GRAY);
+        }
     EndDrawing();
 }
 
 void Game::UpdateDrawGame() {
     UpdateGame();
     DrawGame();
+}
+
+void Game::LoadHighscore() {
+    std::ifstream file("highscore.txt");
+    if (file.is_open()) {
+        file >> highScore;
+        file.close();
+    }
+    else {
+        highScore = 0;
+    }
+}
+
+void Game::SaveHighscore() {
+    std::ofstream file("highscore.txt");
+    if (file.is_open()) {
+        file << highScore;
+        file.close();
+    }
 }

@@ -2,6 +2,14 @@
 
 Game::Game() : grid(), incomingPiece() {
 
+    /*Đọc highscore*/
+    Reset();
+}
+
+void Game::Reset() {
+    grid = Grid();
+    incomingPiece = Piece();
+
     level = 1;
     score = 0;
 
@@ -13,12 +21,13 @@ Game::Game() : grid(), incomingPiece() {
     begin = true;
     pieceActivating = false;
     lineDeleting = false;
+    gameover = false; // Rất quan trọng: đặt lại trạng thái gameover
 
     gravityMovementCounter = 0;
     lateralMovementCounter = 0;
     turnMovementCounter = 0;
     fastFallMovementCounter = 0;
-
+    fadeLineCounter = 0; // Đừng quên reset biến đếm cho hiệu ứng fading
 }
 
 void Game::CreatePiece() {
@@ -421,8 +430,7 @@ void Game::UpdateGame() {
     {
         if (IsKeyPressed(KEY_ENTER))
         {
-            *this = Game();
-            gameover = false;
+            Reset();
         }
     }
 }

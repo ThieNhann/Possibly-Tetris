@@ -31,6 +31,7 @@ public:
     int score;
 public: 
     Game();
+    void Reset();
     void CreatePiece();
     bool CheckCollision();
     void CheckCompletedLine();

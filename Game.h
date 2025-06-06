@@ -17,6 +17,7 @@ public:
     static bool CheckCollision();
     static void CheckCompletedLine();
     static void UpdateCompletedLine();
+    static void UpdateFalling();
 };
 
 

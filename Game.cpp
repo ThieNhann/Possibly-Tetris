@@ -94,3 +94,32 @@ void Game::UpdateCompletedLine() {
         }
     }
 }
+
+void Game::UpdateFalling() {
+    if (CheckCollision()) {
+        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; ++j) {
+
+            for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
+
+                if (grid.GetSquare(i, j) == FALLING) {
+                    grid.SetSquare(i, j, FULL);
+                }
+            }
+        }
+    }
+    else {
+
+        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; ++j) {
+
+            for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
+
+                if (grid.GetSquare(i, j) == FALLING) {
+                    grid.SetSquare(i, j + 1, FALLING);
+                    grid.SetSquare(i, j, EMPTY);
+                }
+            }
+        }
+
+        activePiece.SetPosition({ activePiece.GetPosition().x, activePiece.GetPosition().y + 1 });
+    }
+}

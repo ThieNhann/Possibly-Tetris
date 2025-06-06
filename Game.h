@@ -4,6 +4,7 @@
 #include "Config.h"
 #include "Grid.h"
 #include "Piece.h"
+#include "Sounds.h"
 #include <raylib.h>
 
 
@@ -13,6 +14,7 @@ private:
     Piece activePiece;
     Piece incomingPiece;
 public:
+    Sounds s;
     bool begin;
     bool gameover;
     bool pause;
@@ -24,8 +26,9 @@ public:
     int turnMovementCounter;
     int fadeLineCounter;
     Color fadingColor;
-    int lines;
+    int gravitySpeed;
     int level;
+    int score;
 public: 
     Game();
     void CreatePiece();
@@ -37,6 +40,7 @@ public:
     void UpdateGame();
     void DrawGame();
     void UpdateDrawGame();
+    bool UpdateTurningMovement();
 };
 
 

@@ -1,9 +1,11 @@
 #include "Game.h"
 
 Game::Game() : grid(), incomingPiece() {
-    level = 1;
-    lines = 0;
 
+    level = 1;
+    score = 0;
+
+    gravitySpeed = 20;
     activePiece.SetPosition({0, 0});
 
     pause = false;
@@ -66,7 +68,6 @@ void Game::CheckCompletedLine() {
                 fullSquareCount = 0;
                 lineDeleting = true;
 
-                // Chỉ set các ô từ 1 đến HORIZONTAL_GRID_SIZE-2 (bỏ viền trái/phải)
                 for (int k = 1; k < HORIZONTAL_GRID_SIZE - 1; ++k) {
                     grid.SetSquare(k, j, FADING);
                 }
@@ -83,10 +84,8 @@ int Game::UpdateCompletedLine() {
 
     for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
         
-        // Kiểm tra ô trong vùng dòng, không phải ô viền
         while (grid.GetSquare(1, j) == FADING) {
 
-            // Chỉ set các ô từ 1 đến HORIZONTAL_GRID_SIZE-2 (bỏ viền)
             for (int i = 1; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
                 grid.SetSquare(i, j, EMPTY);
             }
@@ -112,6 +111,7 @@ int Game::UpdateCompletedLine() {
 
 void Game::UpdateFalling() {
     if (CheckCollision()) {
+        s.PlaySoundN(PIECE_LANDED);
         for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
 
             for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
@@ -170,9 +170,10 @@ bool Game::UpdateSideMovement() {
                     }
                 }
             }
-        }
 
-        activePiece.SetPosition({ activePiece.GetPosition().x - 1, activePiece.GetPosition().y });
+            activePiece.SetPosition({ activePiece.GetPosition().x - 1, activePiece.GetPosition().y });
+        }
+        
     }
 
     else if (IsKeyDown(KEY_RIGHT)) {
@@ -201,10 +202,104 @@ bool Game::UpdateSideMovement() {
                     }
                 }
             }
+
+            activePiece.SetPosition({ activePiece.GetPosition().x + 1, activePiece.GetPosition().y });
         }
-        activePiece.SetPosition({ activePiece.GetPosition().x + 1, activePiece.GetPosition().y });
     }
+        
     return collision;
+}
+
+bool Game::UpdateTurningMovement() {
+
+    if (IsKeyDown(KEY_UP))
+    {
+
+        Square rotatedMatrix[4][4];
+        for (int i = 0; i < 4; ++i)
+            for (int j = 0; j < 4; ++j)
+                rotatedMatrix[i][j] = activePiece.GetSquare(i, j);
+
+
+        Square aux;
+        aux = rotatedMatrix[0][0];
+        rotatedMatrix[0][0] = rotatedMatrix[3][0];
+        rotatedMatrix[3][0] = rotatedMatrix[3][3];
+        rotatedMatrix[3][3] = rotatedMatrix[0][3];
+        rotatedMatrix[0][3] = aux;
+
+        aux = rotatedMatrix[1][0];
+        rotatedMatrix[1][0] = rotatedMatrix[3][1];
+        rotatedMatrix[3][1] = rotatedMatrix[2][3];
+        rotatedMatrix[2][3] = rotatedMatrix[0][2];
+        rotatedMatrix[0][2] = aux;
+
+        aux = rotatedMatrix[2][0];
+        rotatedMatrix[2][0] = rotatedMatrix[3][2];
+        rotatedMatrix[3][2] = rotatedMatrix[1][3];
+        rotatedMatrix[1][3] = rotatedMatrix[0][1];
+        rotatedMatrix[0][1] = aux;
+
+        aux = rotatedMatrix[1][1];
+        rotatedMatrix[1][1] = rotatedMatrix[2][1];
+        rotatedMatrix[2][1] = rotatedMatrix[2][2];
+        rotatedMatrix[2][2] = rotatedMatrix[1][2];
+        rotatedMatrix[1][2] = aux;
+
+        Vector2 piecePos = activePiece.GetPosition();
+        int piecePositionX = (int)piecePos.x;
+        int piecePositionY = (int)piecePos.y;
+        bool valid = true;
+        for (int i = 0; i < 4 && valid; ++i) {
+            for (int j = 0; j < 4 && valid; ++j) {
+                if (rotatedMatrix[i][j] == FALLING) {
+                    int gridX = piecePositionX + i;
+                    int gridY = piecePositionY + j;
+                    if (gridX < 1 || gridX >= HORIZONTAL_GRID_SIZE - 1 ||
+                        gridY < 0 || gridY >= VERTICAL_GRID_SIZE - 1 ||
+                        (grid.GetSquare(gridX, gridY) == FULL || grid.GetSquare(gridX, gridY) == BLOCK)) {
+                        valid = false;
+                    }
+                }
+            }
+        }
+
+        if (valid) {
+
+            for (int i = 0; i < 4; ++i)
+                for (int j = 0; j < 4; ++j)
+                    activePiece.SetSquare(i, j, rotatedMatrix[i][j]);
+
+            for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; j--)
+            {
+                for (int i = 1; i < HORIZONTAL_GRID_SIZE - 1; i++)
+                {
+                    if (grid.GetSquare(i, j) == FALLING)
+                    {
+                        grid.SetSquare(i, j, EMPTY);
+                    }
+                }
+            }
+
+            for (int i = piecePositionX; i < piecePositionX + 4; i++)
+            {
+                for (int j = piecePositionY; j < piecePositionY + 4; j++)
+                {
+                    if (activePiece.GetSquare(i - piecePositionX, j - piecePositionY) == FALLING)
+                    {
+                        if (i >= 0 && i < HORIZONTAL_GRID_SIZE && j >= 0 && j < VERTICAL_GRID_SIZE) {
+                            grid.SetSquare(i, j, FALLING);
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    return false;
 }
 
 void Game::UpdateGame() {
@@ -229,14 +324,20 @@ void Game::UpdateGame() {
                     lateralMovementCounter++;
                     turnMovementCounter++;
 
-                    if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT)) lateralMovementCounter = LATERAL_SPEED;
-                    if (IsKeyPressed(KEY_UP)) turnMovementCounter = TURNING_SPEED;
+                    if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT)) {
+                        s.PlaySoundN(MOVE);
+                        lateralMovementCounter = LATERAL_SPEED;
+                    }
+                    if (IsKeyPressed(KEY_UP)) {
+                        s.PlaySoundN(ROTATE);
+                        turnMovementCounter = TURNING_SPEED;
+                    }
                     if (IsKeyDown(KEY_DOWN) && (fastFallMovementCounter >= FAST_FALL_AWAIT_COUNTER))
                     {
-                        gravityMovementCounter += 30 /*Gravity Speed*/;
+                        gravityMovementCounter += gravitySpeed /*Gravity Speed*/;
                     }
 
-                    if (gravityMovementCounter >= 30) {
+                    if (gravityMovementCounter >= gravitySpeed) {
 
                         UpdateFalling();
                         CheckCompletedLine();
@@ -248,7 +349,11 @@ void Game::UpdateGame() {
                         if (!UpdateSideMovement()) lateralMovementCounter = 0;
                     }
 
-                    /*Turning Handle*/
+                    if (turnMovementCounter >= TURNING_SPEED)
+                    {
+
+                        if (UpdateTurningMovement()) turnMovementCounter = 0;
+                    }
                 }
 
                 for (int j = 0; j < 2; j++)
@@ -266,8 +371,8 @@ void Game::UpdateGame() {
             {
                 fadeLineCounter++;
 
-                if (fadeLineCounter % 8 < 4) fadingColor = MAROON;
-                else fadingColor = GRAY;
+                if (fadeLineCounter % 8 < 4) fadingColor = BLACK;
+                else fadingColor = LIGHTGRAY;
 
                 if (fadeLineCounter >= FADING_TIME)
                 {
@@ -276,7 +381,38 @@ void Game::UpdateGame() {
                     fadeLineCounter = 0;
                     lineDeleting = false;
 
-                    lines += deletedLines;
+                    float multiply = 0.8f + 0.2f * (float)level;
+
+                    switch (deletedLines) {
+                        case 1: { 
+                            score += static_cast<int>(100.0f * multiply);
+                            s.PlaySoundN(LINE_CLEAR);
+                            break; 
+                        }
+                        case 2: { 
+                            score += static_cast<int>(300.0f * multiply); 
+                            s.PlaySoundN(LINE_CLEAR);
+                            break; 
+                        }
+                        case 3: { 
+                            score += static_cast<int>(500.0f * multiply); 
+                            s.PlaySoundN(LINE_CLEAR);
+                            break; 
+                        }
+                        case 4: { 
+                            score += static_cast<int>(800.0f * multiply); 
+                            s.PlaySoundN(FOUR_LINES_CLEAR);
+                            break; 
+                        }
+                        default: break;
+                    }
+
+                    if (score > 200 && level == 1) level++;
+                    else if (score > 400 && level == 2) level++;
+                    else if (score > 800 && level == 3) level++;
+                    else if (score > 1200 && level == 4) level++;
+                    
+                    gravitySpeed = 20 + 10 * level;
                 }
             }
         }
@@ -298,17 +434,16 @@ void Game::DrawGame() {
 
         if (!gameover) {
 
-            // Tính toán lại offset để căn giữa lưới theo chiều ngang và dọc
             Vector2 offset;
             offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;
-            offset.y = (screenHeight - ((VERTICAL_GRID_SIZE - 1) * SQUARE_SIZE)) / 2;
+            offset.y = (screenHeight - ((VERTICAL_GRID_SIZE - 5) * SQUARE_SIZE)) / 2;
 
             int controller = offset.x;
             for (int j = 0; j < VERTICAL_GRID_SIZE; j++)
             {
                 for (int i = 0; i < HORIZONTAL_GRID_SIZE; i++)
                 {
-                    // Draw each square of the grid
+
                     if (grid.GetSquare(i, j) == EMPTY)
                     {
                         DrawLine(offset.x, offset.y, offset.x + SQUARE_SIZE, offset.y, LIGHTGRAY );
@@ -333,8 +468,8 @@ void Game::DrawGame() {
                         offset.x += SQUARE_SIZE;
                     }
                     else if (grid.GetSquare(i, j) == FADING)
-                    {
-                        DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, BLACK); // Đổi màu FADING thành đen
+                    {    
+                        DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, fadingColor);
                         offset.x += SQUARE_SIZE;
                     }
                 }
@@ -342,7 +477,6 @@ void Game::DrawGame() {
                 offset.y += SQUARE_SIZE;
             }
 
-            // Vị trí mới cho khối incoming: cùng trục x với lưới
             offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;
             offset.y = 40;
 
@@ -372,7 +506,7 @@ void Game::DrawGame() {
             }
 
             DrawText("INCOMING:", controller, 20, 14, GRAY);
-            DrawText(TextFormat("LINES:      %04i", lines), controller, offset.y + 10, 14, GRAY);
+            DrawText(TextFormat("SCORE: %04i", score ), controller, offset.y + 10, 14, GRAY);
 
             if (pause) DrawText("GAME PAUSED", screenWidth/2 - MeasureText("GAME PAUSED", 40)/2, screenHeight/2 - 40, 40, GRAY);
         

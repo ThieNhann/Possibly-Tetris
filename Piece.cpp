@@ -13,7 +13,7 @@ Piece::Piece(Vector2 pos) : Piece() {
 }
 
 void Piece::SetSquare(int i, int j, Square state) {
-    if (i >= 0 && i <= 3 && j >= 0 && j <= 4) {
+    if (i >= 0 && i <= 3 && j >= 0 && j <= 3) {
         pieceMatrix[i][j] = state;
     }
 }

@@ -313,7 +313,7 @@ void DrawGame(void)
             offset.x = screenWidth/2 - (GRID_HORIZONTAL_SIZE*SQUARE_SIZE/2) - 50;
             offset.y = screenHeight/2 - ((GRID_VERTICAL_SIZE - 1)*SQUARE_SIZE/2) + SQUARE_SIZE*2;
 
-            offset.y -= 50;     // NOTE: Harcoded position!
+            offset.y -= 50;     // NOTE: Hardcoded position!
 
             int controller = offset.x;
 

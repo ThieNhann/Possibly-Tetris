@@ -6,6 +6,7 @@ Sounds::Sounds() {
     move = LoadSound("resources/audio/move.wav");
     piece_landed = LoadSound("resources/audio/piece_landed.wav");
     rotate = LoadSound("resources/audio/rotate.wav");
+    click = LoadSound("resources/audio/click.wav");
 }
 
 Sounds::~Sounds() {
@@ -38,6 +39,14 @@ void Sounds::PlaySoundN(SoundName name) {
             PlaySound(rotate);
             break;
         }
+        case (CLICK) :   {
+            PlaySound(click);
+            break;
+        }
         default: break;
     }
 }
+
+void Sounds::SetVolume(float v) {
+    SetMasterVolume(v);
+} 

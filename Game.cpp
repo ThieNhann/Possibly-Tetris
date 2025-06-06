@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game() : grid(), incomingPiece() {
+Game::Game() : vol({ screenWidth - 2 * SQUARE_SIZE, 2 * SQUARE_SIZE }) {
 
     LoadHighscore();
     Reset();
@@ -9,7 +9,6 @@ Game::Game() : grid(), incomingPiece() {
 void Game::Reset() {
     grid = Grid();
     incomingPiece = Piece();
-
     level = 1;
     score = 0;
 
@@ -323,6 +322,15 @@ void Game::UpdateGame() {
         if (IsKeyPressed('P')) pause = !pause;
 
         if (!pause) {
+            if (((IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+                (GetMousePosition().x >= vol.GetPosition().x && GetMousePosition().x <= vol.GetPosition().x + SQUARE_SIZE &&
+                    GetMousePosition().y >= vol.GetPosition().y && GetMousePosition().y <= vol.GetPosition().y + SQUARE_SIZE)) ||
+                    IsKeyPressed(KEY_M))) {
+
+                        vol.Update();
+                        s.PlaySoundN(CLICK);  
+            }
+            
 
             if (!lineDeleting) {
 
@@ -452,6 +460,8 @@ void Game::DrawGame() {
         ClearBackground(RAYWHITE);
 
         if (!gameover) {
+
+            vol.Draw();
 
             Vector2 offset;
             offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;

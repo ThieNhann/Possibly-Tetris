@@ -5,8 +5,10 @@
 #include "Grid.h"
 #include "Piece.h"
 #include "Sounds.h"
+#include "Button.h"
 #include <raylib.h>
 #include <fstream>
+
 
 class Game {
 private:
@@ -14,6 +16,7 @@ private:
     Piece activePiece;
     Piece incomingPiece;
 public:
+    VolumeButton vol;
     Sounds s;
     bool begin;
     bool gameover;

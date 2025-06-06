@@ -4,7 +4,7 @@
 #include <raylib.h>
 #include <vector>
 
-enum SoundName { FOUR_LINES_CLEAR, LINE_CLEAR, MOVE, PIECE_LANDED, ROTATE };
+enum SoundName { FOUR_LINES_CLEAR, LINE_CLEAR, MOVE, PIECE_LANDED, ROTATE, CLICK };
 
 class Sounds {
 private:
@@ -13,10 +13,12 @@ private:
     Sound move;
     Sound piece_landed;
     Sound rotate;
+    Sound click;
 public:
     Sounds();
     ~Sounds();
     void PlaySoundN(SoundName);
+    void SetVolume(float);
 };
 
 #endif

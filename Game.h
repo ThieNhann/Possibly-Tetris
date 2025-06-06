@@ -13,7 +13,10 @@ private:
     static Piece incomingPiece;
     static bool beginFlag;
 public:
-    void CreatePiece();
+    static void CreatePiece();
+    static bool CheckCollision();
+    static void CheckCompletedLine();
+    static void UpdateCompletedLine();
 };
 
 

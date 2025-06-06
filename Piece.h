@@ -14,8 +14,8 @@ public:
     Piece();
     Piece(Vector2 pos);
     void print() {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
+            for (int i = 0; i < 4; i++) {
                 if (pieceMatrix[i][j] == FALLING) std::cout << "+";
                 if (pieceMatrix[i][j] == EMPTY) std::cout << "-";
             }

@@ -71,7 +71,7 @@ void Game::UpdateCompletedLine() {
 
                 grid.SetSquare(i, j, EMPTY);
                 
-                for (int j2 = j - 1; j2 >= 0; ++j2) {
+                for (int j2 = j - 1; j2 >= 0; --j2) {
 
                     for (int i2 = 0; i2 < HORIZONTAL_GRID_SIZE - 1; ++i2) {
 
@@ -97,7 +97,7 @@ void Game::UpdateCompletedLine() {
 
 void Game::UpdateFalling() {
     if (CheckCollision()) {
-        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; ++j) {
+        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
 
             for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
 
@@ -109,7 +109,7 @@ void Game::UpdateFalling() {
     }
     else {
 
-        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; ++j) {
+        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
 
             for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
 
@@ -121,5 +121,70 @@ void Game::UpdateFalling() {
         }
 
         activePiece.SetPosition({ activePiece.GetPosition().x, activePiece.GetPosition().y + 1 });
+    }
+}
+
+bool Game::UpdateSideMovement() {
+    bool collision = false;
+
+    if (IsKeyDown(KEY_LEFT)) {
+
+        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
+
+            for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
+
+                if (grid.GetSquare(i, j) == FALLING) {
+                    
+                    if (i - 1 == 0 || grid.GetSquare(i - 1, j) == FULL) collision = true;
+
+                }
+            }
+        }
+
+        if (!collision) {
+
+            for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
+
+                for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
+
+                    if (grid.GetSquare(i, j) == FALLING) {
+                        grid.SetSquare(i - 1, j, FALLING);
+                        grid.SetSquare(i, j, EMPTY);
+                    }
+                }
+            }
+        }
+
+        activePiece.SetPosition({ activePiece.GetPosition().x - 1, activePiece.GetPosition().y });
+    }
+
+    else if (IsKeyDown(KEY_RIGHT)) {
+
+        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
+
+            for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
+
+                if (grid.GetSquare(i, j) == FALLING) {
+
+                    if (i + 1 == HORIZONTAL_GRID_SIZE - 1 || grid.GetSquare(i + 1, j) == FULL) collision = true;
+                }
+            }
+        }
+
+        if (!collision) {
+
+            for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
+
+                for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
+
+                    if (grid.GetSquare(i, j) == FALLING) {
+
+                        grid.SetSquare(i + 1, j, FALLING);
+                        grid.SetSquare(i, j, FULL);
+                    }
+                }
+            }
+        }
+        activePiece.SetPosition({ activePiece.GetPosition().x + 1, activePiece.GetPosition().y });
     }
 }

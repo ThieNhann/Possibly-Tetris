@@ -3,7 +3,7 @@
 Square Grid::grid[HORIZONTAL_GRID_SIZE][VERTICAL_GRID_SIZE];
 
 Grid::Grid() {
-    for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
+    for (int j = VERTICAL_GRID_SIZE - 1; j >= 0; --j) {
         for (int i = 0; i <= HORIZONTAL_GRID_SIZE - 1; ++i) {
             if (i == 0 || i == HORIZONTAL_GRID_SIZE - 1 || j == VERTICAL_GRID_SIZE - 1) {
                 grid[i][j] = BLOCK;

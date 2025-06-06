@@ -12,7 +12,7 @@ const int FAST_FALL_AWAIT_COUNTER = 30;
 
 const int FADING_TIME = 33;
 
-const int screenWidth = 800;
-const int screenHeight = 450;
+const int screenWidth = 450;
+const int screenHeight = 800;
 
 #endif

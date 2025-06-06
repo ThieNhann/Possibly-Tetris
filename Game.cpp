@@ -66,10 +66,9 @@ void Game::CheckCompletedLine() {
                 fullSquareCount = 0;
                 lineDeleting = true;
 
-                for (int k = 0; k < HORIZONTAL_GRID_SIZE - 1; ++k) {
-
+                // Chỉ set các ô từ 1 đến HORIZONTAL_GRID_SIZE-2 (bỏ viền trái/phải)
+                for (int k = 1; k < HORIZONTAL_GRID_SIZE - 1; ++k) {
                     grid.SetSquare(k, j, FADING);
-
                 }
             }
 
@@ -84,27 +83,23 @@ int Game::UpdateCompletedLine() {
 
     for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
         
+        // Kiểm tra ô trong vùng dòng, không phải ô viền
         while (grid.GetSquare(1, j) == FADING) {
 
-            for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
-
+            // Chỉ set các ô từ 1 đến HORIZONTAL_GRID_SIZE-2 (bỏ viền)
+            for (int i = 1; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
                 grid.SetSquare(i, j, EMPTY);
-                
-                for (int j2 = j - 1; j2 >= 0; --j2) {
-
-                    for (int i2 = 0; i2 < HORIZONTAL_GRID_SIZE - 1; ++i2) {
-
-                        if (grid.GetSquare(i2, j2) == FULL) {
-
-                            grid.SetSquare(i2, j2 + 1, FULL);
-                            grid.SetSquare(i2, j2, EMPTY); 
-                        }
-
-                        else if (grid.GetSquare(i2, j2) == FADING) {
-
-                            grid.SetSquare(i2, j2 + 1, FADING);
-                            grid.SetSquare(i2, j2, EMPTY);
-                        }
+            }
+            
+            for (int j2 = j - 1; j2 >= 0; --j2) {
+                for (int i2 = 1; i2 < HORIZONTAL_GRID_SIZE - 1; ++i2) {
+                    if (grid.GetSquare(i2, j2) == FULL) {
+                        grid.SetSquare(i2, j2 + 1, FULL);
+                        grid.SetSquare(i2, j2, EMPTY); 
+                    }
+                    else if (grid.GetSquare(i2, j2) == FADING) {
+                        grid.SetSquare(i2, j2 + 1, FADING);
+                        grid.SetSquare(i2, j2, EMPTY);
                     }
                 }
             }
@@ -290,6 +285,7 @@ void Game::UpdateGame() {
     {
         if (IsKeyPressed(KEY_ENTER))
         {
+            *this = Game();
             gameover = false;
         }
     }
@@ -302,10 +298,10 @@ void Game::DrawGame() {
 
         if (!gameover) {
 
+            // Tính toán lại offset để căn giữa lưới theo chiều ngang và dọc
             Vector2 offset;
-            offset.x = screenWidth/2 - (HORIZONTAL_GRID_SIZE*SQUARE_SIZE/2) - 50;
-            offset.y = screenHeight/2 - ((VERTICAL_GRID_SIZE - 1)*SQUARE_SIZE/2) + SQUARE_SIZE*2;
-            offset.y -= 50;
+            offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;
+            offset.y = (screenHeight - ((VERTICAL_GRID_SIZE - 1) * SQUARE_SIZE)) / 2;
 
             int controller = offset.x;
             for (int j = 0; j < VERTICAL_GRID_SIZE; j++)
@@ -338,7 +334,7 @@ void Game::DrawGame() {
                     }
                     else if (grid.GetSquare(i, j) == FADING)
                     {
-                        DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, fadingColor);
+                        DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, BLACK); // Đổi màu FADING thành đen
                         offset.x += SQUARE_SIZE;
                     }
                 }
@@ -346,10 +342,11 @@ void Game::DrawGame() {
                 offset.y += SQUARE_SIZE;
             }
 
-            offset.x = 500;
-            offset.y = 45;
+            // Vị trí mới cho khối incoming: cùng trục x với lưới
+            offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;
+            offset.y = 40;
 
-            int controler = offset.x;
+            controller = offset.x;
 
             for (int j = 0; j < 4; j++)
             {
@@ -370,17 +367,17 @@ void Game::DrawGame() {
                     }
                 }
 
-                offset.x = controler;
+                offset.x = controller;
                 offset.y += SQUARE_SIZE;
             }
 
-            DrawText("INCOMING:", offset.x, offset.y - 100, 10, GRAY);
-            DrawText(TextFormat("LINES:      %04i", lines), offset.x, offset.y + 20, 10, GRAY);
+            DrawText("INCOMING:", controller, 20, 14, GRAY);
+            DrawText(TextFormat("LINES:      %04i", lines), controller, offset.y + 10, 14, GRAY);
 
             if (pause) DrawText("GAME PAUSED", screenWidth/2 - MeasureText("GAME PAUSED", 40)/2, screenHeight/2 - 40, 40, GRAY);
         
         }
-        else DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 - 50, 20, GRAY);
+        else DrawText("PRESS [ENTER] TO PLAY AGAIN", screenWidth/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, screenHeight/2 - 50, 20, GRAY);
     EndDrawing();
 }
 

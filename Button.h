@@ -5,22 +5,63 @@
 #include "Sounds.h"
 #include "Config.h"
 
-enum VolumeButtonState {MUTED, LOW, HIGH};
-class VolumeButton {
-private:
-    Texture2D texture;
+enum ButtonState {
+    DEFAULT,
+    HOVERED,
+    CLICKED
+};
+
+class Button {
+protected:
     Rectangle hitbox;
-    VolumeButtonState state;
+    Texture2D texture;
+    ButtonState state;
+
 public:
-    Texture2D muted;
-    Texture2D volumeLow;
-    Texture2D volumeHigh;
+
+    Button(Vector2 pos, float width, float height, Texture2D defaultTexture);
+
+
+    virtual ~Button();
+
+    Vector2 GetPosition() const;
+    Rectangle GetHitbox() const;
+    ButtonState GetState() const;
+
+
+    virtual void Update(); 
+    virtual void Draw();
+    virtual void OnClick();
+
+    bool IsMouseOver() const;
+};
+
+enum VolumeState {
+    HIGH,
+    LOW,
+    MUTED
+};
+
+class VolumeButton : public Button {
+private:
+    Texture2D mutedTexture;
+    Texture2D volumeLowTexture;
+    Texture2D volumeHighTexture;
+    VolumeState volumeState;
+
 public:
-    VolumeButton(Vector2);
-    ~VolumeButton();
-    Vector2 GetPosition();
-    void Update();
-    void Draw();
+
+    VolumeButton(Vector2 pos, float size);
+
+    ~VolumeButton() override;
+
+    void Update() override;
+
+    void OnClick() override;
+
+private:
+
+    void UpdateTexture();
 };
 
 #endif

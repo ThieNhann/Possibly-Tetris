@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game() : vol({ screenWidth - 2 * SQUARE_SIZE, 2 * SQUARE_SIZE }) {
+Game::Game() : vol({ screenWidth - 4 * SQUARE_SIZE, 2 * SQUARE_SIZE }, SQUARE_SIZE) {
 
     LoadHighscore();
     Reset();
@@ -514,7 +514,10 @@ void Game::DrawGame() {
             DrawText(TextFormat("SCORE: %06i", score ), controller, offset.y + 10, 14, GRAY);
             DrawText(TextFormat("HIGHEST: %06i", highScore), controller, offset.y + 30, 14, GRAY);
 
-            if (pause) DrawText("GAME PAUSED", screenWidth/2 - MeasureText("GAME PAUSED", 40)/2, screenHeight/2 - 40, 40, GRAY);
+            if (pause) {
+                DrawRectangle(0, 0, screenWidth, screenHeight, {200, 200, 200, 128});
+                DrawText("GAME PAUSED", screenWidth/2 - MeasureText("GAME PAUSED", 40)/2, screenHeight/2 - 40, 40, GRAY);
+            }
         
         }
         else {

@@ -1,6 +1,6 @@
 #include "Grid.h"
 
-Square Grid::grid[HORIZONTAL_GRID_SIZE][VERTICAL_GRID_SIZE];
+std::array<std::array<Square, VERTICAL_GRID_SIZE>, HORIZONTAL_GRID_SIZE> Grid::grid;
 
 Grid::Grid() {
     for (int j = VERTICAL_GRID_SIZE - 1; j >= 0; --j) {

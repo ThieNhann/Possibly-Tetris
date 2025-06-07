@@ -7,7 +7,7 @@
 
 class Grid {
 private:
-    static Square grid[HORIZONTAL_GRID_SIZE][VERTICAL_GRID_SIZE];
+    static std::array<std::array<Square, VERTICAL_GRID_SIZE>, HORIZONTAL_GRID_SIZE> grid;
 public:
     Grid();
     void AssignPiece(Vector2, Piece);

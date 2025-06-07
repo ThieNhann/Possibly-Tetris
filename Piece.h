@@ -3,12 +3,13 @@
 
 #include <raylib.h>
 #include <iostream>
+#include <array>
 
 typedef enum Square { FULL, FALLING, EMPTY, BLOCK, FADING } Square;
 
 class Piece {
 protected:
-    Square pieceMatrix[4][4];
+    std::array<std::array<Square, 4>, 4> pieceMatrix;
     Vector2 position;
 public:
     Piece();

@@ -47,11 +47,7 @@ Piece Piece::GetRandomPiece() {
 }
 
 void Piece::CopyPieceMatrix(Piece other) {
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            pieceMatrix[i][j] = other.pieceMatrix[i][j];
-        }
-    }
+    (this)->pieceMatrix = other.pieceMatrix;
 }
 
 

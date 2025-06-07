@@ -47,6 +47,7 @@ public:
     void DrawGame();
     void UpdateDrawGame();
     bool UpdateTurningMovement();
+    void Harddrop();
     void LoadHighscore();
     void SaveHighscore();
 };

@@ -21,13 +21,13 @@ void Game::Reset() {
     begin = true;
     pieceActivating = false;
     lineDeleting = false;
-    gameover = false; // Rất quan trọng: đặt lại trạng thái gameover
+    gameover = false;
 
     gravityMovementCounter = 0;
     lateralMovementCounter = 0;
     turnMovementCounter = 0;
     fastFallMovementCounter = 0;
-    fadeLineCounter = 0; // Đừng quên reset biến đếm cho hiệu ứng fading
+    fadeLineCounter = 0;
 }
 
 void Game::CreatePiece() {
@@ -328,7 +328,13 @@ void Game::UpdateGame() {
                     gravityMovementCounter++;
                     lateralMovementCounter++;
                     turnMovementCounter++;
+                    
 
+                    if (IsKeyPressed(KEY_SPACE)) {
+                        Harddrop();
+                        CheckCompletedLine();
+                        gravityMovementCounter = 0;
+                    }
                     if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_D)) {
                         s.PlaySoundN(CLICK);
                         lateralMovementCounter = LATERAL_SPEED;
@@ -339,7 +345,7 @@ void Game::UpdateGame() {
                     }
                     if (IsKeyDown(KEY_S) && (fastFallMovementCounter >= FAST_FALL_AWAIT_COUNTER))
                     {   
-                        score += 1; 
+                        score += 3; 
                         gravityMovementCounter += gravitySpeed;
                     }
 
@@ -401,7 +407,6 @@ void Game::UpdateGame() {
                     int newLevel = (totalLinesCleared / 10) + 1;
                     if (newLevel > level) {
                         level = newLevel;
-                        // Ví dụ: level 1: speed 48, level 2: 43, ..., level 10: 5, level 29+: 1
                         gravitySpeed = std::max(1, 48 - (level - 1) * 5);
                     }
                     
@@ -522,6 +527,39 @@ void Game::DrawGame() {
 void Game::UpdateDrawGame() {
     UpdateGame();
     DrawGame();
+}
+
+void Game::Harddrop() {
+    int rowDropped = 0;
+    
+    while (!CheckCollision()) {
+
+        ++rowDropped;
+        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
+            for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
+                if (grid.GetSquare(i, j) == FALLING) {
+                    grid.SetSquare(i, j + 1, FALLING);
+                    grid.SetSquare(i, j, EMPTY);
+                }
+            }
+        }
+         activePiece.SetPosition({ activePiece.GetPosition().x, activePiece.GetPosition().y + 1 });
+    }
+
+    for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
+            for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
+                if (grid.GetSquare(i, j) == FALLING) {
+                    grid.SetSquare(i, j, FULL);
+            }
+        }
+    }
+
+    if (rowDropped > 0) {
+        score += rowDropped * 5;
+    }
+
+    s.PlaySoundN(PIECE_LANDED);
+    pieceActivating = false;
 }
 
 void Game::LoadHighscore() {

@@ -39,7 +39,7 @@ void Button::Draw() {
     DrawTexture(texture, (int)hitbox.x, (int)hitbox.y, WHITE);
 
     if (state == HOVERED) {
-        DrawRectangleLines((int)hitbox.x, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height, BLUE);
+        DrawRectangleLines((int)hitbox.x, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height, DARKGRAY);
     } else if (state == CLICKED) {
         DrawRectangleLines((int)hitbox.x, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height, BLACK);
     }

@@ -9,6 +9,7 @@
 #include <raylib.h>
 #include <fstream>
 
+enum RotateDirection { NONE, CLOCKWISE, COUNTERCLOCKWISE, R180 };
 
 class Game {
 private:
@@ -18,7 +19,11 @@ private:
 public:
     std::unique_ptr<Button> pauseButton;
     VolumeButton volumeButton;
+    std::unique_ptr<Button> rotateLeftButton;
+    std::unique_ptr<Button> rotate180Button;
+    std::unique_ptr<Button> rotateRightButton;
 public:
+    RotateDirection requestedRotation;
     Sounds s;
     bool begin;
     bool gameover;

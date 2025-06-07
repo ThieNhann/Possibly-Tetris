@@ -7,6 +7,24 @@ Game::Game() : volumeButton(Vector2{screenWidth - 2 * BUTTON_SIZE, 10 + 2 * BUTT
                                         [&]() {
                                             pause = !pause;
                                         });
+    rotateLeftButton = std::make_unique<Button>(Vector2{10 + BIG_BUTTON_SIZE, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/rotateLeft.png"),
+                                        [&]() {
+                                            requestedRotation = COUNTERCLOCKWISE;
+                                            turnMovementCounter = TURNING_SPEED;
+                                            s.PlaySoundN(ROTATE);
+                                        });
+    rotate180Button = std::make_unique<Button>(Vector2{30 + BIG_BUTTON_SIZE * 2, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/rotate180.png"),
+                                        [&]() {
+                                            requestedRotation = R180;
+                                            turnMovementCounter = TURNING_SPEED;
+                                            s.PlaySoundN(ROTATE);
+                                        });
+    rotateRightButton = std::make_unique<Button>(Vector2{50 + BIG_BUTTON_SIZE * 3, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/rotateRight.png"),
+                                        [&]() {
+                                            requestedRotation = CLOCKWISE;
+                                            turnMovementCounter = TURNING_SPEED;
+                                            s.PlaySoundN(ROTATE);
+                                        });
     Reset();
 }
 
@@ -22,6 +40,7 @@ void Game::Reset() {
 
     pause = false;
 
+    requestedRotation = NONE;
     begin = true;
     pieceActivating = false;
     lineDeleting = false;
@@ -230,43 +249,45 @@ bool Game::UpdateSideMovement() {
 }
 
 bool Game::UpdateTurningMovement() {
+    if (requestedRotation == NONE) return false;
 
     Piece rotatedMatrix = activePiece;
 
-    if (IsKeyDown(KEY_W) || IsKeyDown(KEY_Q) || IsKeyDown(KEY_E)) {
-        if (IsKeyDown(KEY_W))
-        {
-            rotatedMatrix.Rotate180();
-        } else if (IsKeyDown(KEY_Q)) {
-            rotatedMatrix.RotateCounterclockwise();
-        }
-        else if (IsKeyDown(KEY_E)) {
+    switch (requestedRotation) {
+        case CLOCKWISE:
             rotatedMatrix.RotateClockwise();
-        }
+            break;
+        case COUNTERCLOCKWISE:
+            rotatedMatrix.RotateCounterclockwise();
+            break;
+        case R180:
+            rotatedMatrix.Rotate180();
+            break;
+        default:
+            return false;
+    }
 
-        Vector2 piecePos = activePiece.GetPosition();
-        int piecePositionX = (int)piecePos.x;
-        int piecePositionY = (int)piecePos.y;
-        bool valid = true;
-        for (int i = 0; i < 4 && valid; ++i) {
-            for (int j = 0; j < 4 && valid; ++j) {
-                if (rotatedMatrix.GetSquare(i, j) == FALLING) {
-                    int gridX = piecePositionX + i;
-                    int gridY = piecePositionY + j;
-                    if (gridX < 1 || gridX >= HORIZONTAL_GRID_SIZE - 1 ||
-                        gridY < 0 || gridY >= VERTICAL_GRID_SIZE - 1 ||
-                        (grid.GetSquare(gridX, gridY) == FULL || grid.GetSquare(gridX, gridY) == BLOCK)) {
-                        valid = false;
-                    }
+    Vector2 piecePos = activePiece.GetPosition();
+    int piecePositionX = (int)piecePos.x;
+    int piecePositionY = (int)piecePos.y;
+    bool valid = true;
+    for (int i = 0; i < 4 && valid; ++i) {
+        for (int j = 0; j < 4 && valid; ++j) {
+            if (rotatedMatrix.GetSquare(i, j) == FALLING) {
+                int gridX = piecePositionX + i;
+                int gridY = piecePositionY + j;
+                if (gridX < 1 || gridX >= HORIZONTAL_GRID_SIZE - 1 ||
+                    gridY < 0 || gridY >= VERTICAL_GRID_SIZE - 1 ||
+                    (grid.GetSquare(gridX, gridY) == FULL || grid.GetSquare(gridX, gridY) == BLOCK)) {
+                    valid = false;
                 }
             }
-        }   
+        }
+    }   
 
-        if (valid) {
+    if (valid) {
 
-        for (int i = 0; i < 4; ++i)
-            for (int j = 0; j < 4; ++j)
-                activePiece = rotatedMatrix;
+        activePiece = rotatedMatrix;
 
         for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; j--)
         {
@@ -293,11 +314,7 @@ bool Game::UpdateTurningMovement() {
         }
 
         return true;
-        }
     }
-    
-
-    
 
     return false;
 }
@@ -327,6 +344,9 @@ void Game::UpdateGame() {
                     lateralMovementCounter++;
                     turnMovementCounter++;
                     
+                    rotateLeftButton->Update();
+                    rotate180Button->Update();
+                    rotateRightButton->Update();
 
                     if (IsKeyPressed(KEY_SPACE)) {
                         Harddrop();
@@ -340,6 +360,9 @@ void Game::UpdateGame() {
                     if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_E) || IsKeyPressed(KEY_Q)) {
                         s.PlaySoundN(ROTATE);
                         turnMovementCounter = TURNING_SPEED;
+                        if (IsKeyPressed(KEY_W)) requestedRotation = R180;
+                        else if (IsKeyPressed(KEY_Q)) requestedRotation = COUNTERCLOCKWISE;
+                        else if (IsKeyPressed(KEY_E)) requestedRotation = CLOCKWISE;
                     }
                     if (IsKeyDown(KEY_S) && (fastFallMovementCounter >= FAST_FALL_AWAIT_COUNTER))
                     {   
@@ -362,7 +385,11 @@ void Game::UpdateGame() {
                     if (turnMovementCounter >= TURNING_SPEED)
                     {
 
-                        if (UpdateTurningMovement()) turnMovementCounter = 0;
+                        if (UpdateTurningMovement()) {
+                            turnMovementCounter = 0;
+                            requestedRotation = NONE;
+                        }
+                        
                     }
                 }
 
@@ -437,7 +464,10 @@ void Game::DrawGame() {
 
             pauseButton->Draw();
             volumeButton.Draw();
-            
+            rotateLeftButton->Draw();
+            rotate180Button->Draw();
+            rotateRightButton->Draw();
+
             Vector2 offset;
             offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;
             offset.y = (screenHeight - ((VERTICAL_GRID_SIZE - 5) * SQUARE_SIZE)) / 2 - 100;

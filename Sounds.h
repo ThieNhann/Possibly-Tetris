@@ -4,14 +4,13 @@
 #include <raylib.h>
 #include <vector>
 
-enum SoundName { LINE_CLEAR, MOVE, PIECE_LANDED, ROTATE, CLICK };
+enum SoundName { LINE_CLEAR, ROTATE, PIECE_LANDED, CLICK };
 
 class Sounds {
 private:
     Sound line_clear;
-    Sound move;
-    Sound piece_landed;
     Sound rotate;
+    Sound piece_landed;
     Sound click;
 public:
     Sounds();

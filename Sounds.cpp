@@ -2,17 +2,15 @@
 
 Sounds::Sounds() {
     line_clear = LoadSound("resources/audio/line_clear.wav");
-    move = LoadSound("resources/audio/move.wav");
-    piece_landed = LoadSound("resources/audio/piece_landed.wav");
     rotate = LoadSound("resources/audio/rotate.wav");
+    piece_landed = LoadSound("resources/audio/piece_landed.wav");
     click = LoadSound("resources/audio/click.wav");
 }
 
 Sounds::~Sounds() {
     UnloadSound(line_clear);
-    UnloadSound(move);
-    UnloadSound(piece_landed);
     UnloadSound(rotate);
+    UnloadSound(piece_landed);
 }
 
 void Sounds::PlaySoundN(SoundName name) {
@@ -21,16 +19,12 @@ void Sounds::PlaySoundN(SoundName name) {
             PlaySound(line_clear);
             break;
         }
-        case (MOVE) : {
-            PlaySound(move);
+        case (ROTATE) : {
+            PlaySound(rotate);
             break;
         }
         case (PIECE_LANDED) : {
             PlaySound(piece_landed);
-            break;
-        }
-        case (ROTATE) : {
-            PlaySound(rotate);
             break;
         }
         case (CLICK) :   {

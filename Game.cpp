@@ -329,7 +329,7 @@ void Game::UpdateGame() {
                     turnMovementCounter++;
 
                     if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_D)) {
-                        s.PlaySoundN(MOVE);
+                        s.PlaySoundN(CLICK);
                         lateralMovementCounter = LATERAL_SPEED;
                     }
                     if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_E) || IsKeyPressed(KEY_Q)) {
@@ -413,7 +413,7 @@ void Game::UpdateGame() {
                     else if (score > 800 && level == 3) level++;
                     else if (score > 1200 && level == 4) level++;
                     
-                    gravitySpeed = 20 - 3 * level;
+                    gravitySpeed = 20 - 2 * level;
                 }
             }
         }

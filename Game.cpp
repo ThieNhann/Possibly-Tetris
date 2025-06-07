@@ -1,9 +1,8 @@
 #include "Game.h"
 
-Game::Game() {
+Game::Game() : volumeButton(Vector2{screenWidth - 2 * BUTTON_SIZE, 10 + 2 * BUTTON_SIZE}) {
 
     LoadHighscore();
-
     pauseButton = std::make_unique<Button>(Vector2{screenWidth - 2 * BUTTON_SIZE, BUTTON_SIZE}, BUTTON_SIZE, BUTTON_SIZE, LoadTexture("resources/image/pause.png"),
                                         [&]() {
                                             pause = !pause;
@@ -311,7 +310,7 @@ void Game::UpdateGame() {
         if (!pause) {
             
             pauseButton->Update();
-            
+            volumeButton.Update();
 
             if (!lineDeleting) {
 
@@ -437,7 +436,8 @@ void Game::DrawGame() {
         if (!gameover) {
 
             pauseButton->Draw();
-
+            volumeButton.Draw();
+            
             Vector2 offset;
             offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;
             offset.y = (screenHeight - ((VERTICAL_GRID_SIZE - 5) * SQUARE_SIZE)) / 2 - 100;

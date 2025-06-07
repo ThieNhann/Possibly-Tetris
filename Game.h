@@ -17,6 +17,7 @@ private:
     Piece incomingPiece;
 public:
     std::unique_ptr<Button> pauseButton;
+    VolumeButton volumeButton;
 public:
     Sounds s;
     bool begin;

@@ -37,34 +37,30 @@ public:
     bool IsMouseOver() const;
 };
 
-/*enum VolumeState {
+enum VolumeState {
     HIGH,
     LOW,
     MUTED
 };
 
-class VolumeButton : public Button {
+class VolumeButton {
 private:
+    Rectangle hitbox;
+    Texture2D texture;
+    ButtonState state;
     Texture2D mutedTexture;
     Texture2D volumeLowTexture;
     Texture2D volumeHighTexture;
     VolumeState volumeState;
-
 public:
-    VolumeButton(Vector2 pos, float size);
-    ~VolumeButton() override;
-    void Update() override;
-    void OnClick() override;
+    VolumeButton(Vector2 pos);
+    ~VolumeButton();
+    void Update();
+    void OnClick();
+    bool IsMouseOver();
+    void Draw();
 private:
     void UpdateTexture();
 };
-
-class PauseButton : public Button {
-public:
-    PauseButton(Vector2 pos);
-    ~PauseButton() override;
-    void Update() override;
-    void OnClick(bool& gamePause) override;
-}; */
 
 #endif

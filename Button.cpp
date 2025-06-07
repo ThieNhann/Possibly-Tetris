@@ -57,18 +57,18 @@ bool Button::IsMouseOver() const {
 
 /*--------------------------Volume Button---------------------------------*/
 
-/*
-VolumeButton::VolumeButton(Vector2 pos, float size)
-
-    : Button(pos, size, size, LoadTexture("resources/image/volume2.png")),
-      mutedTexture(LoadTexture("resources/image/mute.png")),
-      volumeLowTexture(LoadTexture("resources/image/volume1.png")),
-      volumeHighTexture(LoadTexture("resources/image/volume2.png")),
-      volumeState(HIGH) {
-    
+VolumeButton::VolumeButton(Vector2 pos) {
+    hitbox = Rectangle{pos.x, pos.y, BUTTON_SIZE, BUTTON_SIZE};
+    texture = LoadTexture("resources/image/volume2.png");
+    state = DEFAULT;
+    mutedTexture = LoadTexture("resources/image/mute.png");
+    volumeLowTexture = LoadTexture("resources/image/volume1.png");
+    volumeHighTexture = LoadTexture("resources/image/volume2.png");
     SetMasterVolume(1.0f);
     texture = volumeHighTexture;
+
 }
+    
 
 VolumeButton::~VolumeButton() {
     UnloadTexture(mutedTexture);
@@ -76,8 +76,21 @@ VolumeButton::~VolumeButton() {
     UnloadTexture(volumeHighTexture);
 }
 
+bool VolumeButton::IsMouseOver() {
+    return CheckCollisionPointRec(GetMousePosition(), hitbox);
+}
+
 void VolumeButton::Update() {
-    Button::Update();
+    if (IsMouseOver()) {
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            state = CLICKED;
+            OnClick();
+        } else {
+            state = HOVERED;
+        }
+    } else {
+        state = DEFAULT;
+    }
 }
 
 void VolumeButton::OnClick() {
@@ -95,7 +108,16 @@ void VolumeButton::OnClick() {
         texture = volumeHighTexture;
     }
 }
-*/
+
+void VolumeButton::Draw() {
+    DrawTexture(texture, (int)hitbox.x, (int)hitbox.y, WHITE);
+
+    if (state == HOVERED) {
+        DrawRectangleLines((int)hitbox.x, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height, BLUE);
+    } else if (state == CLICKED) {
+        DrawRectangleLines((int)hitbox.x, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height, BLACK);
+    }
+}
 
 /*
 

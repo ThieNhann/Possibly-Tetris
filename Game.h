@@ -16,7 +16,8 @@ private:
     Piece activePiece;
     Piece incomingPiece;
 public:
-    VolumeButton vol;
+    std::unique_ptr<Button> pauseButton;
+public:
     Sounds s;
     bool begin;
     bool gameover;

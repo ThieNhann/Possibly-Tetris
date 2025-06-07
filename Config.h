@@ -5,6 +5,7 @@ const int HORIZONTAL_GRID_SIZE = 12;
 const int VERTICAL_GRID_SIZE = 20;
 
 const int SQUARE_SIZE = 25;
+const int BUTTON_SIZE = 25;
 
 const int LATERAL_SPEED = 10;
 const int TURNING_SPEED = 12;

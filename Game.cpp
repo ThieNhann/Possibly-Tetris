@@ -1,8 +1,13 @@
 #include "Game.h"
 
-Game::Game() : vol({ screenWidth - 4 * SQUARE_SIZE, 2 * SQUARE_SIZE }, SQUARE_SIZE) {
+Game::Game() {
 
     LoadHighscore();
+
+    pauseButton = std::make_unique<Button>(Vector2{screenWidth - 2 * BUTTON_SIZE, BUTTON_SIZE}, BUTTON_SIZE, BUTTON_SIZE, LoadTexture("resources/image/pause.png"),
+                                        [&]() {
+                                            pause = !pause;
+                                        });
     Reset();
 }
 
@@ -304,14 +309,8 @@ void Game::UpdateGame() {
         if (IsKeyPressed('P')) pause = !pause;
 
         if (!pause) {
-            if (((IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-                (GetMousePosition().x >= vol.GetPosition().x && GetMousePosition().x <= vol.GetPosition().x + SQUARE_SIZE &&
-                    GetMousePosition().y >= vol.GetPosition().y && GetMousePosition().y <= vol.GetPosition().y + SQUARE_SIZE)) ||
-                    IsKeyPressed(KEY_M))) {
-
-                        vol.Update();
-                        s.PlaySoundN(CLICK);  
-            }
+            
+            pauseButton->Update();
             
 
             if (!lineDeleting) {
@@ -437,11 +436,11 @@ void Game::DrawGame() {
 
         if (!gameover) {
 
-            vol.Draw();
+            pauseButton->Draw();
 
             Vector2 offset;
             offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;
-            offset.y = (screenHeight - ((VERTICAL_GRID_SIZE - 5) * SQUARE_SIZE)) / 2;
+            offset.y = (screenHeight - ((VERTICAL_GRID_SIZE - 5) * SQUARE_SIZE)) / 2 - 100;
 
             int controller = offset.x;
             for (int j = 0; j < VERTICAL_GRID_SIZE; j++)
@@ -517,12 +516,13 @@ void Game::DrawGame() {
             if (pause) {
                 DrawRectangle(0, 0, screenWidth, screenHeight, {200, 200, 200, 128});
                 DrawText("GAME PAUSED", screenWidth/2 - MeasureText("GAME PAUSED", 40)/2, screenHeight/2 - 40, 40, GRAY);
+                DrawText("TAP ANYWHERE TO CONTINUE", screenWidth/2 - MeasureText("TAP ANYWHERE TO CONTINUE", 20)/2, screenHeight/2, 20, GRAY);
             }
         
         }
         else {
             DrawText(TextFormat("SCORE: %06i", score), screenWidth/2 - MeasureText(TextFormat("HIGH SCORE: %06i", highScore), 20)/2, screenHeight/2 - 80, 20, GRAY);
-            DrawText("PRESS [ENTER] TO PLAY AGAIN", screenWidth/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, screenHeight/2 - 50, 20, GRAY);
+            DrawText("PRESS [ENTER] TO PLAY", screenWidth/2 - MeasureText("PRESS [ENTER] TO PLAY", 20)/2, screenHeight/2 - 50, 20, GRAY);
         }
     EndDrawing();
 }

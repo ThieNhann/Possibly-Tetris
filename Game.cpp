@@ -385,8 +385,6 @@ void Game::UpdateGame() {
                     int deletedLines = 0;
                     deletedLines = UpdateCompletedLine();
                     if (deletedLines > 0) s.PlaySoundN(LINE_CLEAR);
-                    fadeLineCounter = 0;
-                    lineDeleting = false;
 
                     totalLinesCleared += deletedLines;
 

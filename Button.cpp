@@ -22,18 +22,24 @@ ButtonState Button::GetState() const {
 }
 
 void Button::Update() {
-
     if (IsMouseOver()) {
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
             state = CLICKED;
-            OnClick();
+            holdCounter++;
+
+            if (holdCounter == 1 || (holdCounter > initialDelay && (holdCounter - initialDelay) % repeatRate == 0)) {
+                OnClick();
+            }
         } else {
             state = HOVERED;
+            holdCounter = 0;
         }
     } else {
         state = DEFAULT;
+        holdCounter = 0; 
     }
 }
+
 
 void Button::Draw() {
     DrawTexture(texture, (int)hitbox.x, (int)hitbox.y, WHITE);

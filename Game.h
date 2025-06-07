@@ -24,6 +24,8 @@ public:
     std::unique_ptr<Button> rotateRightButton;
     std::unique_ptr<Button> moveLeftButton;
     std::unique_ptr<Button> moveRightButton;
+    std::unique_ptr<Button> fastDropButton;
+    std::unique_ptr<Button> hardDropButton;
 public:
     RotateDirection requestedRotation;
     MoveDirection requestedMoveDirection;
@@ -40,6 +42,7 @@ public:
     int fadeLineCounter;
     Color fadingColor;
     int gravitySpeed;
+    int fastFallSpeed;
     int level;
     int score;
     int highScore;

@@ -36,6 +36,19 @@ Game::Game() : volumeButton(Vector2{screenWidth - 2 * BUTTON_SIZE, 10 + 2 * BUTT
                                             requestedMoveDirection = RIGHT;
                                             s.PlaySoundN(CLICK);
                                             lateralMovementCounter = LATERAL_SPEED;
+                                        });
+    fastDropButton = std::make_unique<Button>(Vector2{screenWidth - BIG_BUTTON_SIZE * 2, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/fastDrop.png"),
+                                        [&]() {
+                                            if (fastFallMovementCounter >= FAST_FALL_AWAIT_COUNTER) {
+                                                score += 3; 
+                                                gravityMovementCounter += fastFallSpeed;
+                                            }
+                                        });           
+    hardDropButton = std::make_unique<Button>(Vector2{screenWidth - BIG_BUTTON_SIZE * 2, screenHeight + 20 - 4 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/hardDrop.png"),
+                                        [&]() {
+                                            Harddrop();
+                                            CheckCompletedLine();
+                                            gravityMovementCounter = 0;
                                         });                                                                
     Reset();
 }
@@ -47,7 +60,8 @@ void Game::Reset() {
     score = 0;
     totalLinesCleared = 0;
 
-    gravitySpeed = 48;
+    fastFallSpeed = 45;
+    gravitySpeed = 45;
     activePiece.SetPosition({0, 0});
 
     pause = false;
@@ -367,6 +381,8 @@ void Game::UpdateGame() {
                     rotateRightButton->Update();
                     moveLeftButton->Update();
                     moveRightButton->Update();
+                    fastDropButton->Update();
+                    hardDropButton->Update();
 
                     if (IsKeyPressed(KEY_SPACE)) {
                         Harddrop();
@@ -393,7 +409,6 @@ void Game::UpdateGame() {
                     }
 
                     if (gravityMovementCounter >= gravitySpeed) {
-
                         UpdateFalling();
                         CheckCompletedLine();
                         gravityMovementCounter = 0;
@@ -457,14 +472,18 @@ void Game::UpdateGame() {
                     int newLevel = (totalLinesCleared / 10) + 1;
                     if (newLevel > level) {
                         level = newLevel;
-                        gravitySpeed = std::max(1, 48 - (level - 1) * 5);
+                        gravitySpeed = std::max(1, 45 - (level - 1) * 3);
                     }
                     
                     fadeLineCounter = 0;
                     lineDeleting = false;
                 }
             }
-        }
+        } else {
+            if (CheckCollisionPointRec(GetMousePosition(), Rectangle{0, 0, screenWidth, screenHeight}) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                pause = !pause;
+            }
+        } 
     }
     else
     {
@@ -494,6 +513,9 @@ void Game::DrawGame() {
             rotateRightButton->Draw();
             moveLeftButton->Draw();
             moveRightButton->Draw();
+            fastDropButton->Draw();
+            hardDropButton->Draw();
+
 
             Vector2 offset;
             offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;

@@ -19,6 +19,10 @@ protected:
     Texture2D texture;
     ButtonState state;
     std::function<void()> onClickCallback;
+
+    int holdCounter = 0;
+    const int initialDelay = 15;
+    const int repeatRate = 5;
 public:
 
     Button(Vector2 pos, float width, float height, Texture2D defaultTexture, std::function<void()> callback = nullptr);

@@ -5,12 +5,14 @@ Sounds::Sounds() {
     rotate = LoadSound("resources/audio/rotate.wav");
     piece_landed = LoadSound("resources/audio/piece_landed.wav");
     click = LoadSound("resources/audio/click.wav");
+    fall = LoadSound("resources/audio/fall.wav");
 }
 
 Sounds::~Sounds() {
     UnloadSound(line_clear);
     UnloadSound(rotate);
     UnloadSound(piece_landed);
+    UnloadSound(fall);
 }
 
 void Sounds::PlaySoundN(SoundName name) {
@@ -29,6 +31,10 @@ void Sounds::PlaySoundN(SoundName name) {
         }
         case (CLICK) :   {
             PlaySound(click);
+            break;
+        }
+        case (FALL) : {
+            PlaySound(fall);
             break;
         }
         default: break;

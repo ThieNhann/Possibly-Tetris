@@ -10,7 +10,7 @@ const int BIG_BUTTON_SIZE = 50;
 
 const int LATERAL_SPEED = 10;
 const int TURNING_SPEED = 12;
-const int FAST_FALL_AWAIT_COUNTER = 30;
+const int FAST_FALL_AWAIT_COUNTER = 20;
 
 const int FADING_TIME = 33;
 

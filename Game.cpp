@@ -382,6 +382,7 @@ void Game::UpdateGame() {
                 {
                     int deletedLines = 0;
                     deletedLines = UpdateCompletedLine();
+                    if (deletedLines > 0) s.PlaySoundN(LINE_CLEAR);
                     fadeLineCounter = 0;
                     lineDeleting = false;
 
@@ -390,22 +391,18 @@ void Game::UpdateGame() {
                     switch (deletedLines) {
                         case 1: { 
                             score += static_cast<int>(100.0f * multiply);
-                            s.PlaySoundN(LINE_CLEAR);
                             break; 
                         }
                         case 2: { 
                             score += static_cast<int>(300.0f * multiply); 
-                            s.PlaySoundN(LINE_CLEAR);
                             break; 
                         }
                         case 3: { 
                             score += static_cast<int>(500.0f * multiply); 
-                            s.PlaySoundN(LINE_CLEAR);
                             break; 
                         }
                         case 4: { 
                             score += static_cast<int>(800.0f * multiply); 
-                            s.PlaySoundN(FOUR_LINES_CLEAR);
                             break; 
                         }
                         default: break;
@@ -416,7 +413,7 @@ void Game::UpdateGame() {
                     else if (score > 800 && level == 3) level++;
                     else if (score > 1200 && level == 4) level++;
                     
-                    gravitySpeed = 20 + 10 * level;
+                    gravitySpeed = 20 - 3 * level;
                 }
             }
         }

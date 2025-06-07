@@ -33,6 +33,7 @@ public:
     int level;
     int score;
     int highScore;
+    int totalLinesCleared;
 public: 
     Game();
     void Reset();

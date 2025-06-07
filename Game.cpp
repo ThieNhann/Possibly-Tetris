@@ -11,8 +11,9 @@ void Game::Reset() {
     incomingPiece = Piece();
     level = 1;
     score = 0;
+    totalLinesCleared = 0;
 
-    gravitySpeed = 20;
+    gravitySpeed = 48;
     activePiece.SetPosition({0, 0});
 
     pause = false;
@@ -337,7 +338,8 @@ void Game::UpdateGame() {
                         turnMovementCounter = TURNING_SPEED;
                     }
                     if (IsKeyDown(KEY_S) && (fastFallMovementCounter >= FAST_FALL_AWAIT_COUNTER))
-                    {
+                    {   
+                        score += 1; 
                         gravityMovementCounter += gravitySpeed;
                     }
 
@@ -386,34 +388,27 @@ void Game::UpdateGame() {
                     fadeLineCounter = 0;
                     lineDeleting = false;
 
-                    float multiply = 0.8f + 0.2f * (float)level;
+                    totalLinesCleared += deletedLines;
 
+                    int baseScore = 0;
                     switch (deletedLines) {
-                        case 1: { 
-                            score += static_cast<int>(100.0f * multiply);
-                            break; 
-                        }
-                        case 2: { 
-                            score += static_cast<int>(300.0f * multiply); 
-                            break; 
-                        }
-                        case 3: { 
-                            score += static_cast<int>(500.0f * multiply); 
-                            break; 
-                        }
-                        case 4: { 
-                            score += static_cast<int>(800.0f * multiply); 
-                            break; 
-                        }
+                        case 1: baseScore = 40; break;  
+                        case 2: baseScore = 100; break; 
+                        case 3: baseScore = 300; break; 
+                        case 4: baseScore = 1200; break;
                         default: break;
                     }
+                    score += baseScore * level;
 
-                    if (score > 200 && level == 1) level++;
-                    else if (score > 400 && level == 2) level++;
-                    else if (score > 800 && level == 3) level++;
-                    else if (score > 1200 && level == 4) level++;
+                    int newLevel = (totalLinesCleared / 10) + 1;
+                    if (newLevel > level) {
+                        level = newLevel;
+                        // Ví dụ: level 1: speed 48, level 2: 43, ..., level 10: 5, level 29+: 1
+                        gravitySpeed = std::max(1, 48 - (level - 1) * 5);
+                    }
                     
-                    gravitySpeed = 20 - 2 * level;
+                    fadeLineCounter = 0;
+                    lineDeleting = false;
                 }
             }
         }

@@ -25,6 +25,18 @@ Game::Game() : volumeButton(Vector2{screenWidth - 2 * BUTTON_SIZE, 10 + 2 * BUTT
                                             turnMovementCounter = TURNING_SPEED;
                                             s.PlaySoundN(ROTATE);
                                         });
+    moveLeftButton = std::make_unique<Button>(Vector2{10 + BIG_BUTTON_SIZE, screenHeight + 20 - 4 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/moveLeft.png"),
+                                        [&]() {
+                                            requestedMoveDirection = LEFT;
+                                            s.PlaySoundN(CLICK);
+                                            lateralMovementCounter = LATERAL_SPEED;
+                                        });      
+    moveRightButton = std::make_unique<Button>(Vector2{50 + BIG_BUTTON_SIZE * 3, screenHeight + 20 - 4 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/moveRight.png"),
+                                        [&]() {
+                                            requestedMoveDirection = RIGHT;
+                                            s.PlaySoundN(CLICK);
+                                            lateralMovementCounter = LATERAL_SPEED;
+                                        });                                                                
     Reset();
 }
 
@@ -180,71 +192,77 @@ void Game::UpdateFalling() {
 }
 
 bool Game::UpdateSideMovement() {
+
+    if (!requestedMoveDirection) return false;
+
     bool collision = false;
 
-    if (IsKeyDown(KEY_A)) {
-
-        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
-
-            for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
-
-                if (grid.GetSquare(i, j) == FALLING) {
-                    
-                    if (i - 1 == 0 || grid.GetSquare(i - 1, j) == FULL) collision = true;
-
-                }
-            }
-        }
-
-        if (!collision) {
-
+    switch (requestedMoveDirection) {
+        case LEFT: {
             for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
 
                 for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
 
                     if (grid.GetSquare(i, j) == FALLING) {
-                        grid.SetSquare(i - 1, j, FALLING);
-                        grid.SetSquare(i, j, EMPTY);
+                        
+                        if (i - 1 == 0 || grid.GetSquare(i - 1, j) == FULL) collision = true;
+
                     }
                 }
             }
 
-            activePiece.SetPosition({ activePiece.GetPosition().x - 1, activePiece.GetPosition().y });
-        }
-        
-    }
+            if (!collision) {
 
-    else if (IsKeyDown(KEY_D)) {
+                for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
 
-        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
+                    for (int i = 0; i < HORIZONTAL_GRID_SIZE - 1; ++i) {
 
-            for (int i = HORIZONTAL_GRID_SIZE - 2; i >= 0; --i) {
-
-                if (grid.GetSquare(i, j) == FALLING) {
-
-                    if (i + 1 == HORIZONTAL_GRID_SIZE - 1 || grid.GetSquare(i + 1, j) == FULL) collision = true;
+                        if (grid.GetSquare(i, j) == FALLING) {
+                            grid.SetSquare(i - 1, j, FALLING);
+                            grid.SetSquare(i, j, EMPTY);
+                        }
+                    }
                 }
+
+                activePiece.SetPosition({ activePiece.GetPosition().x - 1, activePiece.GetPosition().y });
             }
+
+            break;
         }
-
-        if (!collision) {
-
+        case RIGHT: {
             for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
-                    
+
                 for (int i = HORIZONTAL_GRID_SIZE - 2; i >= 0; --i) {
 
                     if (grid.GetSquare(i, j) == FALLING) {
 
-                        grid.SetSquare(i + 1, j, FALLING);
-                        grid.SetSquare(i, j, EMPTY);
+                        if (i + 1 == HORIZONTAL_GRID_SIZE - 1 || grid.GetSquare(i + 1, j) == FULL) collision = true;
                     }
                 }
             }
 
-            activePiece.SetPosition({ activePiece.GetPosition().x + 1, activePiece.GetPosition().y });
+            if (!collision) {
+
+                for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
+                        
+                    for (int i = HORIZONTAL_GRID_SIZE - 2; i >= 0; --i) {
+
+                        if (grid.GetSquare(i, j) == FALLING) {
+
+                            grid.SetSquare(i + 1, j, FALLING);
+                            grid.SetSquare(i, j, EMPTY);
+                        }
+                    }
+                }
+
+                activePiece.SetPosition({ activePiece.GetPosition().x + 1, activePiece.GetPosition().y });
+            }
+            
+            break;
         }
+        default: return false;
     }
-        
+
     return collision;
 }
 
@@ -347,6 +365,8 @@ void Game::UpdateGame() {
                     rotateLeftButton->Update();
                     rotate180Button->Update();
                     rotateRightButton->Update();
+                    moveLeftButton->Update();
+                    moveRightButton->Update();
 
                     if (IsKeyPressed(KEY_SPACE)) {
                         Harddrop();
@@ -356,6 +376,8 @@ void Game::UpdateGame() {
                     if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_D)) {
                         s.PlaySoundN(CLICK);
                         lateralMovementCounter = LATERAL_SPEED;
+                        if (IsKeyPressed(KEY_A)) requestedMoveDirection = LEFT;
+                        else if (IsKeyPressed(KEY_D)) requestedMoveDirection = RIGHT;
                     }
                     if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_E) || IsKeyPressed(KEY_Q)) {
                         s.PlaySoundN(ROTATE);
@@ -379,7 +401,10 @@ void Game::UpdateGame() {
 
                     if (lateralMovementCounter >= LATERAL_SPEED)
                     {
-                        if (!UpdateSideMovement()) lateralMovementCounter = 0;
+                        if (!UpdateSideMovement()) {
+                            requestedMoveDirection = NONEm;
+                            lateralMovementCounter = 0;
+                        }
                     }
 
                     if (turnMovementCounter >= TURNING_SPEED)
@@ -467,6 +492,8 @@ void Game::DrawGame() {
             rotateLeftButton->Draw();
             rotate180Button->Draw();
             rotateRightButton->Draw();
+            moveLeftButton->Draw();
+            moveRightButton->Draw();
 
             Vector2 offset;
             offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;

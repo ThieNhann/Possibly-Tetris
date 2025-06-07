@@ -10,7 +10,7 @@
 #include <fstream>
 
 enum RotateDirection { NONE, CLOCKWISE, COUNTERCLOCKWISE, R180 };
-
+enum MoveDirection {NONEm,  LEFT, RIGHT};
 class Game {
 private:
     Grid grid;
@@ -22,8 +22,11 @@ public:
     std::unique_ptr<Button> rotateLeftButton;
     std::unique_ptr<Button> rotate180Button;
     std::unique_ptr<Button> rotateRightButton;
+    std::unique_ptr<Button> moveLeftButton;
+    std::unique_ptr<Button> moveRightButton;
 public:
     RotateDirection requestedRotation;
+    MoveDirection requestedMoveDirection;
     Sounds s;
     bool begin;
     bool gameover;

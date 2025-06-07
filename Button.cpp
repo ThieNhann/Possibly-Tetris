@@ -24,7 +24,7 @@ ButtonState Button::GetState() const {
 void Button::Update() {
 
     if (IsMouseOver()) {
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
             state = CLICKED;
             OnClick();
         } else {

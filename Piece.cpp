@@ -50,6 +50,50 @@ void Piece::CopyPieceMatrix(Piece other) {
     (this)->pieceMatrix = other.pieceMatrix;
 }
 
+void Piece::RotateCounterclockwise() {
+    std::array<std::array<Square, 4>, 4> temp;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            temp[i][j] = pieceMatrix[3 - j][i];
+        }
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            pieceMatrix[i][j] = temp[i][j];
+        }
+    }
+}
+
+void Piece::RotateClockwise() {
+    std::array<std::array<Square, 4>, 4> temp;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            temp[i][j] = pieceMatrix[j][3 - i];
+        }
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            pieceMatrix[i][j] = temp[i][j];
+        }
+    }
+}
+
+void Piece::Rotate180() {
+    std::array<std::array<Square, 4>, 4> temp;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            temp[i][j] = pieceMatrix[3 - i][3 - j];
+        }
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            pieceMatrix[i][j] = temp[i][j];
+        }
+    }
+}
 
 /*------------------------Derived Pieces------------------------*/
 

@@ -158,7 +158,7 @@ void Game::UpdateFalling() {
 bool Game::UpdateSideMovement() {
     bool collision = false;
 
-    if (IsKeyDown(KEY_LEFT)) {
+    if (IsKeyDown(KEY_A)) {
 
         for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
 
@@ -190,7 +190,7 @@ bool Game::UpdateSideMovement() {
         
     }
 
-    else if (IsKeyDown(KEY_RIGHT)) {
+    else if (IsKeyDown(KEY_D)) {
 
         for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; --j) {
 
@@ -226,39 +226,18 @@ bool Game::UpdateSideMovement() {
 
 bool Game::UpdateTurningMovement() {
 
-    if (IsKeyDown(KEY_UP))
-    {
+    Piece rotatedMatrix = activePiece;
 
-        Square rotatedMatrix[4][4];
-        for (int i = 0; i < 4; ++i)
-            for (int j = 0; j < 4; ++j)
-                rotatedMatrix[i][j] = activePiece.GetSquare(i, j);
-
-
-        Square aux;
-        aux = rotatedMatrix[0][0];
-        rotatedMatrix[0][0] = rotatedMatrix[3][0];
-        rotatedMatrix[3][0] = rotatedMatrix[3][3];
-        rotatedMatrix[3][3] = rotatedMatrix[0][3];
-        rotatedMatrix[0][3] = aux;
-
-        aux = rotatedMatrix[1][0];
-        rotatedMatrix[1][0] = rotatedMatrix[3][1];
-        rotatedMatrix[3][1] = rotatedMatrix[2][3];
-        rotatedMatrix[2][3] = rotatedMatrix[0][2];
-        rotatedMatrix[0][2] = aux;
-
-        aux = rotatedMatrix[2][0];
-        rotatedMatrix[2][0] = rotatedMatrix[3][2];
-        rotatedMatrix[3][2] = rotatedMatrix[1][3];
-        rotatedMatrix[1][3] = rotatedMatrix[0][1];
-        rotatedMatrix[0][1] = aux;
-
-        aux = rotatedMatrix[1][1];
-        rotatedMatrix[1][1] = rotatedMatrix[2][1];
-        rotatedMatrix[2][1] = rotatedMatrix[2][2];
-        rotatedMatrix[2][2] = rotatedMatrix[1][2];
-        rotatedMatrix[1][2] = aux;
+    if (IsKeyDown(KEY_W) || IsKeyDown(KEY_Q) || IsKeyDown(KEY_E)) {
+        if (IsKeyDown(KEY_W))
+        {
+            rotatedMatrix.Rotate180();
+        } else if (IsKeyDown(KEY_Q)) {
+            rotatedMatrix.RotateCounterclockwise();
+        }
+        else if (IsKeyDown(KEY_E)) {
+            rotatedMatrix.RotateClockwise();
+        }
 
         Vector2 piecePos = activePiece.GetPosition();
         int piecePositionX = (int)piecePos.x;
@@ -266,7 +245,7 @@ bool Game::UpdateTurningMovement() {
         bool valid = true;
         for (int i = 0; i < 4 && valid; ++i) {
             for (int j = 0; j < 4 && valid; ++j) {
-                if (rotatedMatrix[i][j] == FALLING) {
+                if (rotatedMatrix.GetSquare(i, j) == FALLING) {
                     int gridX = piecePositionX + i;
                     int gridY = piecePositionY + j;
                     if (gridX < 1 || gridX >= HORIZONTAL_GRID_SIZE - 1 ||
@@ -276,42 +255,44 @@ bool Game::UpdateTurningMovement() {
                     }
                 }
             }
-        }
+        }   
 
         if (valid) {
 
-            for (int i = 0; i < 4; ++i)
-                for (int j = 0; j < 4; ++j)
-                    activePiece.SetSquare(i, j, rotatedMatrix[i][j]);
+        for (int i = 0; i < 4; ++i)
+            for (int j = 0; j < 4; ++j)
+                activePiece = rotatedMatrix;
 
-            for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; j--)
+        for (int j = VERTICAL_GRID_SIZE - 2; j >= 0; j--)
+        {
+            for (int i = 1; i < HORIZONTAL_GRID_SIZE - 1; i++)
             {
-                for (int i = 1; i < HORIZONTAL_GRID_SIZE - 1; i++)
+                if (grid.GetSquare(i, j) == FALLING)
                 {
-                    if (grid.GetSquare(i, j) == FALLING)
-                    {
-                        grid.SetSquare(i, j, EMPTY);
-                    }
+                    grid.SetSquare(i, j, EMPTY);
                 }
             }
-
-            for (int i = piecePositionX; i < piecePositionX + 4; i++)
-            {
-                for (int j = piecePositionY; j < piecePositionY + 4; j++)
-                {
-                    if (activePiece.GetSquare(i - piecePositionX, j - piecePositionY) == FALLING)
-                    {
-                        if (i >= 0 && i < HORIZONTAL_GRID_SIZE - 1 && j >= 0 && j < VERTICAL_GRID_SIZE - 1) {
-                            grid.SetSquare(i, j, FALLING);
-                        }
-                    }
-                }
-            }
-            return true;
         }
 
-        return false;
+        for (int i = piecePositionX; i < piecePositionX + 4; i++)
+        {
+            for (int j = piecePositionY; j < piecePositionY + 4; j++)
+            {
+                if (activePiece.GetSquare(i - piecePositionX, j - piecePositionY) == FALLING)
+                {
+                    if (i >= 0 && i < HORIZONTAL_GRID_SIZE - 1 && j >= 0 && j < VERTICAL_GRID_SIZE - 1) {
+                        grid.SetSquare(i, j, FALLING);
+                    }
+                }
+            }
+        }
+
+        return true;
+        }
     }
+    
+
+    
 
     return false;
 }
@@ -347,15 +328,15 @@ void Game::UpdateGame() {
                     lateralMovementCounter++;
                     turnMovementCounter++;
 
-                    if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT)) {
+                    if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_D)) {
                         s.PlaySoundN(MOVE);
                         lateralMovementCounter = LATERAL_SPEED;
                     }
-                    if (IsKeyPressed(KEY_UP)) {
+                    if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_E) || IsKeyPressed(KEY_Q)) {
                         s.PlaySoundN(ROTATE);
                         turnMovementCounter = TURNING_SPEED;
                     }
-                    if (IsKeyDown(KEY_DOWN) && (fastFallMovementCounter >= FAST_FALL_AWAIT_COUNTER))
+                    if (IsKeyDown(KEY_S) && (fastFallMovementCounter >= FAST_FALL_AWAIT_COUNTER))
                     {
                         gravityMovementCounter += gravitySpeed;
                     }
@@ -535,14 +516,14 @@ void Game::DrawGame() {
             }
 
             DrawText("INCOMING:", controller, 20, 14, GRAY);
-            DrawText(TextFormat("SCORE: %04i", score ), controller, offset.y + 10, 14, GRAY);
-            DrawText(TextFormat("HIGH SCORE: %04i", highScore), controller, offset.y + 30, 14, GRAY);
+            DrawText(TextFormat("SCORE: %06i", score ), controller, offset.y + 10, 14, GRAY);
+            DrawText(TextFormat("HIGHEST: %06i", highScore), controller, offset.y + 30, 14, GRAY);
 
             if (pause) DrawText("GAME PAUSED", screenWidth/2 - MeasureText("GAME PAUSED", 40)/2, screenHeight/2 - 40, 40, GRAY);
         
         }
         else {
-            DrawText(TextFormat("SCORE: %04i", score), screenWidth/2 - MeasureText(TextFormat("HIGH SCORE: %04i", highScore), 20)/2, screenHeight/2 - 80, 20, GRAY);
+            DrawText(TextFormat("SCORE: %06i", score), screenWidth/2 - MeasureText(TextFormat("HIGH SCORE: %06i", highScore), 20)/2, screenHeight/2 - 80, 20, GRAY);
             DrawText("PRESS [ENTER] TO PLAY AGAIN", screenWidth/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, screenHeight/2 - 50, 20, GRAY);
         }
     EndDrawing();

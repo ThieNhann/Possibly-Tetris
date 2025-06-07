@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include <iostream>
 #include <array>
+#include <utility>
 
 typedef enum Square { FULL, FALLING, EMPTY, BLOCK, FADING } Square;
 
@@ -31,6 +32,9 @@ public:
     void SetPosition(Vector2);
     Vector2 GetPosition();
     static Piece GetRandomPiece();
+    void RotateCounterclockwise();
+    void RotateClockwise();
+    void Rotate180();
 };
 
 class CubePiece : public Piece {

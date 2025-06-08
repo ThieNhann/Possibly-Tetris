@@ -1,11 +1,11 @@
 #include "Sounds.h"
 
 Sounds::Sounds() {
-    line_clear = LoadSound("resources/audio/line_clear.wav");
-    rotate = LoadSound("resources/audio/rotate.wav");
-    piece_landed = LoadSound("resources/audio/piece_landed.wav");
-    click = LoadSound("resources/audio/click.wav");
-    fall = LoadSound("resources/audio/fall.wav");
+    line_clear = LoadSound("assets/audio/line_clear.wav");
+    rotate = LoadSound("assets/audio/rotate.wav");
+    piece_landed = LoadSound("assets/audio/piece_landed.wav");
+    click = LoadSound("assets/audio/click.wav");
+    fall = LoadSound("assets/audio/fall.wav");
 }
 
 Sounds::~Sounds() {

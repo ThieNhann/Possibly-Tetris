@@ -65,11 +65,11 @@ bool Button::IsMouseOver() const {
 
 VolumeButton::VolumeButton(Vector2 pos) {
     hitbox = Rectangle{pos.x, pos.y, BUTTON_SIZE, BUTTON_SIZE};
-    texture = LoadTexture("resources/image/volume2.png");
+    texture = LoadTexture("assets/image/volume2.png");
     state = DEFAULT;
-    mutedTexture = LoadTexture("resources/image/mute.png");
-    volumeLowTexture = LoadTexture("resources/image/volume1.png");
-    volumeHighTexture = LoadTexture("resources/image/volume2.png");
+    mutedTexture = LoadTexture("assets/image/mute.png");
+    volumeLowTexture = LoadTexture("assets/image/volume1.png");
+    volumeHighTexture = LoadTexture("assets/image/volume2.png");
     SetMasterVolume(1.0f);
     texture = volumeHighTexture;
 
@@ -127,7 +127,7 @@ void VolumeButton::Draw() {
 
 /*
 
-PauseButton::PauseButton(Vector2 pos) : Button(pos, BUTTON_SIZE, BUTTON_SIZE, LoadTexture("resources/image/pause.png")) {}
+PauseButton::PauseButton(Vector2 pos) : Button(pos, BUTTON_SIZE, BUTTON_SIZE, LoadTexture("assets/image/pause.png")) {}
 
 PauseButton::~PauseButton() {
     UnloadTexture(texture);

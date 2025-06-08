@@ -3,48 +3,48 @@
 Game::Game() : volumeButton(Vector2{screenWidth - 2 * BUTTON_SIZE, 10 + 2 * BUTTON_SIZE}) {
 
     LoadHighscore();
-    pauseButton = std::make_unique<Button>(Vector2{screenWidth - 2 * BUTTON_SIZE, BUTTON_SIZE}, BUTTON_SIZE, BUTTON_SIZE, LoadTexture("resources/image/pause.png"),
+    pauseButton = std::make_unique<Button>(Vector2{screenWidth - 2 * BUTTON_SIZE, BUTTON_SIZE}, BUTTON_SIZE, BUTTON_SIZE, LoadTexture("assets/image/pause.png"),
                                         [&]() {
                                             pause = !pause;
                                         });
-    rotateLeftButton = std::make_unique<Button>(Vector2{10 + BIG_BUTTON_SIZE, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/rotateLeft.png"),
+    rotateLeftButton = std::make_unique<Button>(Vector2{10 + BIG_BUTTON_SIZE, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("assets/image/rotateLeft.png"),
                                         [&]() {
                                             requestedRotation = COUNTERCLOCKWISE;
                                             turnMovementCounter = TURNING_SPEED;
                                             s.PlaySoundN(ROTATE);
                                         });
-    rotate180Button = std::make_unique<Button>(Vector2{30 + BIG_BUTTON_SIZE * 2, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/rotate180.png"),
+    rotate180Button = std::make_unique<Button>(Vector2{30 + BIG_BUTTON_SIZE * 2, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("assets/image/rotate180.png"),
                                         [&]() {
                                             requestedRotation = R180;
                                             turnMovementCounter = TURNING_SPEED;
                                             s.PlaySoundN(ROTATE);
                                         });
-    rotateRightButton = std::make_unique<Button>(Vector2{50 + BIG_BUTTON_SIZE * 3, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/rotateRight.png"),
+    rotateRightButton = std::make_unique<Button>(Vector2{50 + BIG_BUTTON_SIZE * 3, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("assets/image/rotateRight.png"),
                                         [&]() {
                                             requestedRotation = CLOCKWISE;
                                             turnMovementCounter = TURNING_SPEED;
                                             s.PlaySoundN(ROTATE);
                                         });
-    moveLeftButton = std::make_unique<Button>(Vector2{10 + BIG_BUTTON_SIZE, screenHeight + 20 - 4 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/moveLeft.png"),
+    moveLeftButton = std::make_unique<Button>(Vector2{10 + BIG_BUTTON_SIZE, screenHeight + 20 - 4 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("assets/image/moveLeft.png"),
                                         [&]() {
                                             requestedMoveDirection = LEFT;
                                             s.PlaySoundN(CLICK);
                                             lateralMovementCounter = LATERAL_SPEED;
                                         });      
-    moveRightButton = std::make_unique<Button>(Vector2{50 + BIG_BUTTON_SIZE * 3, screenHeight + 20 - 4 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/moveRight.png"),
+    moveRightButton = std::make_unique<Button>(Vector2{50 + BIG_BUTTON_SIZE * 3, screenHeight + 20 - 4 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("assets/image/moveRight.png"),
                                         [&]() {
                                             requestedMoveDirection = RIGHT;
                                             s.PlaySoundN(CLICK);
                                             lateralMovementCounter = LATERAL_SPEED;
                                         });
-    fastDropButton = std::make_unique<Button>(Vector2{screenWidth - BIG_BUTTON_SIZE * 2, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/fastDrop.png"),
+    fastDropButton = std::make_unique<Button>(Vector2{screenWidth - BIG_BUTTON_SIZE * 2, screenHeight - 5 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("assets/image/fastDrop.png"),
                                         [&]() {
                                             if (fastFallMovementCounter >= FAST_FALL_AWAIT_COUNTER) {
                                                 score += 3; 
                                                 gravityMovementCounter += fastFallSpeed;
                                             }
                                         });           
-    hardDropButton = std::make_unique<Button>(Vector2{screenWidth - BIG_BUTTON_SIZE * 2, screenHeight + 20 - 4 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("resources/image/hardDrop.png"),
+    hardDropButton = std::make_unique<Button>(Vector2{screenWidth - BIG_BUTTON_SIZE * 2, screenHeight + 20 - 4 * BIG_BUTTON_SIZE}, BIG_BUTTON_SIZE, BIG_BUTTON_SIZE, LoadTexture("assets/image/hardDrop.png"),
                                         [&]() {
                                             Harddrop();
                                             CheckCompletedLine();

@@ -49,7 +49,8 @@ Game::Game() : volumeButton(Vector2{screenWidth - 2 * BUTTON_SIZE, 10 + 2 * BUTT
                                             Harddrop();
                                             CheckCompletedLine();
                                             gravityMovementCounter = 0;
-                                        });                                                                
+                                        });                                   
+    startScreen = true;                             
     Reset();
 }
 
@@ -352,149 +353,159 @@ bool Game::UpdateTurningMovement() {
 }
 
 void Game::UpdateGame() {
-    if (!gameover) {
+    if (!startScreen) {
+        if (!gameover) {
 
-        if (IsKeyPressed('P')) pause = !pause;
+            if (IsKeyPressed('P')) pause = !pause;
 
-        if (!pause) {
-            
-            pauseButton->Update();
-            volumeButton.Update();
+            if (!pause) {
 
-            if (!lineDeleting) {
+                pauseButton->Update();
+                volumeButton.Update();
 
-                if (!pieceActivating) {
+                if (!lineDeleting) {
 
-                    CreatePiece();
-                    pieceActivating = true;
-                    fastFallMovementCounter = 0;
-                }
-                else {
+                    if (!pieceActivating) {
 
-                    fastFallMovementCounter++;
-                    gravityMovementCounter++;
-                    lateralMovementCounter++;
-                    turnMovementCounter++;
-                    
-                    rotateLeftButton->Update();
-                    rotate180Button->Update();
-                    rotateRightButton->Update();
-                    moveLeftButton->Update();
-                    moveRightButton->Update();
-                    fastDropButton->Update();
-                    hardDropButton->Update();
+                        CreatePiece();
+                        pieceActivating = true;
+                        fastFallMovementCounter = 0;
+                    } else {
 
-                    if (IsKeyPressed(KEY_SPACE)) {
-                        Harddrop();
-                        CheckCompletedLine();
-                        gravityMovementCounter = 0;
-                    }
-                    if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_D)) {
-                        s.PlaySoundN(CLICK);
-                        lateralMovementCounter = LATERAL_SPEED;
-                        if (IsKeyPressed(KEY_A)) requestedMoveDirection = LEFT;
-                        else if (IsKeyPressed(KEY_D)) requestedMoveDirection = RIGHT;
-                    }
-                    if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_E) || IsKeyPressed(KEY_Q)) {
-                        s.PlaySoundN(ROTATE);
-                        turnMovementCounter = TURNING_SPEED;
-                        if (IsKeyPressed(KEY_W)) requestedRotation = R180;
-                        else if (IsKeyPressed(KEY_Q)) requestedRotation = COUNTERCLOCKWISE;
-                        else if (IsKeyPressed(KEY_E)) requestedRotation = CLOCKWISE;
-                    }
-                    if (IsKeyDown(KEY_S) && (fastFallMovementCounter >= FAST_FALL_AWAIT_COUNTER))
-                    {   
-                        score += 3; 
-                        gravityMovementCounter += gravitySpeed;
-                    }
+                        fastFallMovementCounter++;
+                        gravityMovementCounter++;
+                        lateralMovementCounter++;
+                        turnMovementCounter++;
 
-                    if (gravityMovementCounter >= gravitySpeed) {
-                        UpdateFalling();
-                        CheckCompletedLine();
-                        gravityMovementCounter = 0;
-                    }
+                        rotateLeftButton->Update();
+                        rotate180Button->Update();
+                        rotateRightButton->Update();
+                        moveLeftButton->Update();
+                        moveRightButton->Update();
+                        fastDropButton->Update();
+                        hardDropButton->Update();
 
-                    if (lateralMovementCounter >= LATERAL_SPEED)
-                    {
-                        if (!UpdateSideMovement()) {
-                            requestedMoveDirection = NONEm;
-                            lateralMovementCounter = 0;
+                        if (IsKeyPressed(KEY_SPACE)) {
+                            Harddrop();
+                            CheckCompletedLine();
+                            gravityMovementCounter = 0;
+                        }
+                        if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_D)) {
+                            s.PlaySoundN(CLICK);
+                            lateralMovementCounter = LATERAL_SPEED;
+                            if (IsKeyPressed(KEY_A)) requestedMoveDirection = LEFT;
+                            else if (IsKeyPressed(KEY_D)) requestedMoveDirection = RIGHT;
+                        }
+                        if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_E) || IsKeyPressed(KEY_Q)) {
+                            s.PlaySoundN(ROTATE);
+                            turnMovementCounter = TURNING_SPEED;
+                            if (IsKeyPressed(KEY_W)) requestedRotation = R180;
+                            else if (IsKeyPressed(KEY_Q)) requestedRotation = COUNTERCLOCKWISE;
+                            else if (IsKeyPressed(KEY_E)) requestedRotation = CLOCKWISE;
+                        }
+                        if (IsKeyDown(KEY_S) &&
+                            (fastFallMovementCounter >= FAST_FALL_AWAIT_COUNTER)) {
+                            score += 3;
+                            gravityMovementCounter += gravitySpeed;
+                        }
+
+                        if (gravityMovementCounter >= gravitySpeed) {
+                            UpdateFalling();
+                            CheckCompletedLine();
+                            gravityMovementCounter = 0;
+                        }
+
+                        if (lateralMovementCounter >= LATERAL_SPEED) {
+                            if (!UpdateSideMovement()) {
+                                requestedMoveDirection = NONEm;
+                                lateralMovementCounter = 0;
+                            }
+                        }
+
+                        if (turnMovementCounter >= TURNING_SPEED) {
+
+                            if (UpdateTurningMovement()) {
+                                turnMovementCounter = 0;
+                                requestedRotation = NONE;
+                            }
+
                         }
                     }
 
-                    if (turnMovementCounter >= TURNING_SPEED)
-                    {
-
-                        if (UpdateTurningMovement()) {
-                            turnMovementCounter = 0;
-                            requestedRotation = NONE;
-                        }
-                        
-                    }
-                }
-
-                for (int j = 0; j < 2; j++)
-                {
-                    for (int i = 1; i < HORIZONTAL_GRID_SIZE - 1; i++)
-                    {
-                        if (grid.GetSquare(i, j) == FULL)
-                        {
-                            gameover = true;
+                    for (int j = 0; j < 2; j++) {
+                        for (int i = 1; i < HORIZONTAL_GRID_SIZE - 1; i++) {
+                            if (grid.GetSquare(i, j) == FULL) {
+                                gameover = true;
+                            }
                         }
                     }
+                } else {
+                    fadeLineCounter++;
+
+                    if (fadeLineCounter % 8 < 4) fadingColor = BLACK;
+                    else fadingColor = LIGHTGRAY;
+
+                    if (fadeLineCounter >= FADING_TIME) {
+                        int deletedLines = 0;
+                        deletedLines = UpdateCompletedLine();
+                        if (deletedLines > 0) s.PlaySoundN(LINE_CLEAR);
+
+                        totalLinesCleared += deletedLines;
+
+                        int baseScore = 0;
+                        switch (deletedLines) {
+                            case 1:
+                                baseScore = 40;
+                                break;
+                            case 2:
+                                baseScore = 100;
+                                break;
+                            case 3:
+                                baseScore = 300;
+                                break;
+                            case 4:
+                                baseScore = 1200;
+                                break;
+                            default:
+                                break;
+                        }
+                        score += baseScore * level;
+
+                        int newLevel = (totalLinesCleared / 10) + 1;
+                        if (newLevel > level) {
+                            level = newLevel;
+                            gravitySpeed = std::max(1, 45 - (level - 1) * 3);
+                        }
+
+                        fadeLineCounter = 0;
+                        lineDeleting = false;
+                    }
                 }
-            }
-            else
-            {
-                fadeLineCounter++;
-
-                if (fadeLineCounter % 8 < 4) fadingColor = BLACK;
-                else fadingColor = LIGHTGRAY;
-
-                if (fadeLineCounter >= FADING_TIME)
-                {
-                    int deletedLines = 0;
-                    deletedLines = UpdateCompletedLine();
-                    if (deletedLines > 0) s.PlaySoundN(LINE_CLEAR);
-
-                    totalLinesCleared += deletedLines;
-
-                    int baseScore = 0;
-                    switch (deletedLines) {
-                        case 1: baseScore = 40; break;  
-                        case 2: baseScore = 100; break; 
-                        case 3: baseScore = 300; break; 
-                        case 4: baseScore = 1200; break;
-                        default: break;
-                    }
-                    score += baseScore * level;
-
-                    int newLevel = (totalLinesCleared / 10) + 1;
-                    if (newLevel > level) {
-                        level = newLevel;
-                        gravitySpeed = std::max(1, 45 - (level - 1) * 3);
-                    }
-                    
-                    fadeLineCounter = 0;
-                    lineDeleting = false;
+            } else {
+                if (CheckCollisionPointRec(GetMousePosition(),
+                                           Rectangle{0, 0, screenWidth, screenHeight}) &&
+                    IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                    pause = !pause;
                 }
             }
         } else {
-            if (CheckCollisionPointRec(GetMousePosition(), Rectangle{0, 0, screenWidth, screenHeight}) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                pause = !pause;
-            }
-        } 
-    }
-    else
-    {
-        if (IsKeyPressed(KEY_ENTER) || (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), Rectangle{0, 0, screenWidth, screenHeight})))
-        {
-            if (score > highScore) {
-                highScore = score;
-                SaveHighscore();
-            }
-            Reset();
+            if (IsKeyPressed(KEY_ENTER) || (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+                                            CheckCollisionPointRec(GetMousePosition(),
+                                                                   Rectangle{0, 0, screenWidth,
+                                                                             screenHeight}))) {
+                if (score > highScore) {
+                    highScore = score;
+                    SaveHighscore();
+                }
+                Reset();
 
+            }
+        }
+    } else {
+        if (CheckCollisionPointRec(GetMousePosition(),
+                                   Rectangle{0, 0, screenWidth, screenHeight}) &&
+            IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            startScreen = !startScreen;
         }
     }
 }
@@ -503,105 +514,114 @@ void Game::DrawGame() {
     BeginDrawing();
 
         ClearBackground(RAYWHITE);
+        if (!startScreen) {
+            if (!gameover) {
 
-        if (!gameover) {
-
-            pauseButton->Draw();
-            volumeButton.Draw();
-            rotateLeftButton->Draw();
-            rotate180Button->Draw();
-            rotateRightButton->Draw();
-            moveLeftButton->Draw();
-            moveRightButton->Draw();
-            fastDropButton->Draw();
-            hardDropButton->Draw();
+                pauseButton->Draw();
+                volumeButton.Draw();
+                rotateLeftButton->Draw();
+                rotate180Button->Draw();
+                rotateRightButton->Draw();
+                moveLeftButton->Draw();
+                moveRightButton->Draw();
+                fastDropButton->Draw();
+                hardDropButton->Draw();
 
 
-            Vector2 offset;
-            offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;
-            offset.y = (screenHeight - ((VERTICAL_GRID_SIZE - 5) * SQUARE_SIZE)) / 2 - 100;
+                Vector2 offset;
+                offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;
+                offset.y = (screenHeight - ((VERTICAL_GRID_SIZE - 5) * SQUARE_SIZE)) / 2 - 100;
 
-            int controller = offset.x;
-            for (int j = 0; j < VERTICAL_GRID_SIZE; j++)
-            {
-                for (int i = 0; i < HORIZONTAL_GRID_SIZE; i++)
-                {
+                int controller = offset.x;
+                for (int j = 0; j < VERTICAL_GRID_SIZE; j++) {
+                    for (int i = 0; i < HORIZONTAL_GRID_SIZE; i++) {
 
-                    if (grid.GetSquare(i, j) == EMPTY)
-                    {
-                        DrawLine(offset.x, offset.y, offset.x + SQUARE_SIZE, offset.y, LIGHTGRAY );
-                        DrawLine(offset.x, offset.y, offset.x, offset.y + SQUARE_SIZE, LIGHTGRAY );
-                        DrawLine(offset.x + SQUARE_SIZE, offset.y, offset.x + SQUARE_SIZE, offset.y + SQUARE_SIZE, LIGHTGRAY );
-                        DrawLine(offset.x, offset.y + SQUARE_SIZE, offset.x + SQUARE_SIZE, offset.y + SQUARE_SIZE, LIGHTGRAY );
-                        offset.x += SQUARE_SIZE;
+                        if (grid.GetSquare(i, j) == EMPTY) {
+                            DrawLine(offset.x, offset.y, offset.x + SQUARE_SIZE, offset.y,
+                                     LIGHTGRAY);
+                            DrawLine(offset.x, offset.y, offset.x, offset.y + SQUARE_SIZE,
+                                     LIGHTGRAY);
+                            DrawLine(offset.x + SQUARE_SIZE, offset.y, offset.x + SQUARE_SIZE,
+                                     offset.y + SQUARE_SIZE, LIGHTGRAY);
+                            DrawLine(offset.x, offset.y + SQUARE_SIZE, offset.x + SQUARE_SIZE,
+                                     offset.y + SQUARE_SIZE, LIGHTGRAY);
+                            offset.x += SQUARE_SIZE;
+                        } else if (grid.GetSquare(i, j) == FULL) {
+                            DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, GRAY);
+                            offset.x += SQUARE_SIZE;
+                        } else if (grid.GetSquare(i, j) == FALLING) {
+                            DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, DARKGRAY);
+                            offset.x += SQUARE_SIZE;
+                        } else if (grid.GetSquare(i, j) == BLOCK) {
+                            DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, LIGHTGRAY);
+                            offset.x += SQUARE_SIZE;
+                        } else if (grid.GetSquare(i, j) == FADING) {
+                            DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE,
+                                          fadingColor);
+                            offset.x += SQUARE_SIZE;
+                        }
                     }
-                    else if (grid.GetSquare(i, j) == FULL)
-                    {
-                        DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, GRAY);
-                        offset.x += SQUARE_SIZE;
-                    }
-                    else if (grid.GetSquare(i, j) == FALLING)
-                    {
-                        DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, DARKGRAY);
-                        offset.x += SQUARE_SIZE;
-                    }
-                    else if (grid.GetSquare(i, j) == BLOCK)
-                    {
-                        DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, LIGHTGRAY);
-                        offset.x += SQUARE_SIZE;
-                    }
-                    else if (grid.GetSquare(i, j) == FADING)
-                    {    
-                        DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, fadingColor);
-                        offset.x += SQUARE_SIZE;
-                    }
-                }
-                offset.x = controller;
-                offset.y += SQUARE_SIZE;
-            }
-
-            offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;
-            offset.y = 40;
-
-            controller = offset.x;
-
-            for (int j = 0; j < 4; j++)
-            {
-                for (int i = 0; i < 4; i++)
-                {
-                    if (incomingPiece.GetSquare(i, j) == EMPTY)
-                    {
-                        DrawLine(offset.x, offset.y, offset.x + SQUARE_SIZE, offset.y, LIGHTGRAY );
-                        DrawLine(offset.x, offset.y, offset.x, offset.y + SQUARE_SIZE, LIGHTGRAY );
-                        DrawLine(offset.x + SQUARE_SIZE, offset.y, offset.x + SQUARE_SIZE, offset.y + SQUARE_SIZE, LIGHTGRAY );
-                        DrawLine(offset.x, offset.y + SQUARE_SIZE, offset.x + SQUARE_SIZE, offset.y + SQUARE_SIZE, LIGHTGRAY );
-                        offset.x += SQUARE_SIZE;
-                    }
-                    else if (incomingPiece.GetSquare(i, j) == FALLING)
-                    {
-                        DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, GRAY);
-                        offset.x += SQUARE_SIZE;
-                    }
+                    offset.x = controller;
+                    offset.y += SQUARE_SIZE;
                 }
 
-                offset.x = controller;
-                offset.y += SQUARE_SIZE;
-            }
+                offset.x = (screenWidth - (HORIZONTAL_GRID_SIZE * SQUARE_SIZE)) / 2;
+                offset.y = 40;
 
-            DrawText("INCOMING:", controller, 20, 14, GRAY);
-            DrawText(TextFormat("SCORE: %06i", score ), controller, offset.y + 10, 14, GRAY);
-            DrawText(TextFormat("HIGHEST: %06i", highScore), controller, offset.y + 30, 14, GRAY);
+                controller = offset.x;
 
-            if (pause) {
-                DrawRectangle(0, 0, screenWidth, screenHeight, {200, 200, 200, 128});
-                DrawText("GAME PAUSED", screenWidth/2 - MeasureText("GAME PAUSED", 40)/2, screenHeight/2 - 40, 40, GRAY);
-                DrawText("TAP ANYWHERE TO CONTINUE", screenWidth/2 - MeasureText("TAP ANYWHERE TO CONTINUE", 20)/2, screenHeight/2, 20, GRAY);
+                for (int j = 0; j < 4; j++) {
+                    for (int i = 0; i < 4; i++) {
+                        if (incomingPiece.GetSquare(i, j) == EMPTY) {
+                            DrawLine(offset.x, offset.y, offset.x + SQUARE_SIZE, offset.y,
+                                     LIGHTGRAY);
+                            DrawLine(offset.x, offset.y, offset.x, offset.y + SQUARE_SIZE,
+                                     LIGHTGRAY);
+                            DrawLine(offset.x + SQUARE_SIZE, offset.y, offset.x + SQUARE_SIZE,
+                                     offset.y + SQUARE_SIZE, LIGHTGRAY);
+                            DrawLine(offset.x, offset.y + SQUARE_SIZE, offset.x + SQUARE_SIZE,
+                                     offset.y + SQUARE_SIZE, LIGHTGRAY);
+                            offset.x += SQUARE_SIZE;
+                        } else if (incomingPiece.GetSquare(i, j) == FALLING) {
+                            DrawRectangle(offset.x, offset.y, SQUARE_SIZE, SQUARE_SIZE, GRAY);
+                            offset.x += SQUARE_SIZE;
+                        }
+                    }
+
+                    offset.x = controller;
+                    offset.y += SQUARE_SIZE;
+                }
+
+                DrawText("INCOMING:", controller, 20, 14, GRAY);
+                DrawText(TextFormat("SCORE: %06i", score), controller, offset.y + 10, 14, GRAY);
+                DrawText(TextFormat("HIGHEST: %06i", highScore), controller, offset.y + 30, 14,
+                         GRAY);
+
+                if (pause) {
+                    DrawRectangle(0, 0, screenWidth, screenHeight, {200, 200, 200, 128});
+                    DrawText("GAME PAUSED", screenWidth / 2 - MeasureText("GAME PAUSED", 40) / 2,
+                             screenHeight / 2 - 40, 40, GRAY);
+                    DrawText("TAP ANYWHERE TO CONTINUE",
+                             screenWidth / 2 - MeasureText("TAP ANYWHERE TO CONTINUE", 20) / 2,
+                             screenHeight / 2, 20, GRAY);
+                }
+
+            } else {
+                DrawText(TextFormat("SCORE: %06i", score), screenWidth / 2 - MeasureText(
+                                 TextFormat("HIGH SCORE: %06i", highScore), 20) / 2, screenHeight / 2 - 80,
+                         20, GRAY);
+                DrawText("TAP ANYWHERE TO PLAY AGAIN",
+                         screenWidth / 2 - MeasureText("TAP ANYWHERE TO PLAY AGAIN", 20) / 2,
+                         screenHeight / 2 - 50, 20, GRAY);
             }
-        
         }
         else {
-            DrawText(TextFormat("SCORE: %06i", score), screenWidth/2 - MeasureText(TextFormat("HIGH SCORE: %06i", highScore), 20)/2, screenHeight/2 - 80, 20, GRAY);
-            DrawText("TAP ANYWHERE TO PLAY AGAIN", screenWidth/2 - MeasureText("TAP ANYWHERE TO PLAY AGAIN", 20)/2, screenHeight/2 - 50, 20, GRAY);
+            DrawRectangle(0, 0, screenWidth, screenHeight, {200, 200, 200, 128});
+            DrawText("Simple Tetris", screenWidth / 2 - MeasureText("Simple Tetris", 40) / 2,
+                     screenHeight / 2 - 40, 40, GRAY);
+            DrawText("TAP ANYWHERE TO START",
+                     screenWidth / 2 - MeasureText("TAP ANYWHERE TO START", 20) / 2,
+                     screenHeight / 2, 20, GRAY);
         }
     EndDrawing();
 }

@@ -33,6 +33,7 @@ public:
     bool begin;
     bool gameover;
     bool pause;
+    bool startScreen;
     bool pieceActivating;
     bool lineDeleting;
     int fastFallMovementCounter;

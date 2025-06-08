@@ -487,7 +487,7 @@ void Game::UpdateGame() {
     }
     else
     {
-        if (IsKeyPressed(KEY_ENTER))
+        if (IsKeyPressed(KEY_ENTER) || (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), Rectangle{0, 0, screenWidth, screenHeight})))
         {
             if (score > highScore) {
                 highScore = score;
@@ -601,7 +601,7 @@ void Game::DrawGame() {
         }
         else {
             DrawText(TextFormat("SCORE: %06i", score), screenWidth/2 - MeasureText(TextFormat("HIGH SCORE: %06i", highScore), 20)/2, screenHeight/2 - 80, 20, GRAY);
-            DrawText("PRESS [ENTER] TO PLAY", screenWidth/2 - MeasureText("PRESS [ENTER] TO PLAY", 20)/2, screenHeight/2 - 50, 20, GRAY);
+            DrawText("TAP ANYWHERE TO PLAY AGAIN", screenWidth/2 - MeasureText("TAP ANYWHERE TO PLAY AGAIN", 20)/2, screenHeight/2 - 50, 20, GRAY);
         }
     EndDrawing();
 }
